@@ -60,10 +60,11 @@ impl INode3D for Player {
 
         if let Some(mut model) = self.model.clone() {
             let direction = Vector3::new(direction.x, 0., direction.y).normalized();
-            model.look_at(self.base().to_global(direction));
+            model.look_at_ex(self.base().to_global(direction)).up(self.up).done();
         }
 
-        if let Some(raycast) = self.raycast.clone() {
+        if let Some(mut raycast) = self.raycast.clone() {
+            raycast.force_raycast_update();
             let collider = raycast.get_collider();
             if let Some(collider) = collider
                 && let Ok(platform) = collider.try_cast::<Platform>()
