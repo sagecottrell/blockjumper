@@ -1,0 +1,49 @@
+[gd_scene format=3 uid="uid://dm5ft0kunyls6"]
+
+[ext_resource type="Script" uid="uid://cbai5lh0grbdw" path="res://cube.gd" id="1_k3834"]
+[ext_resource type="BoxMesh" uid="uid://yqnpw72qpnt" path="res://models/Cube/cube_mesh.tres" id="2_ae35o"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_5j4jy"]
+height = 2.4
+radius = 0.4
+
+[node name="Cube" type="Platform" unique_id=1938752761 node_paths=PackedStringArray("pos_x", "neg_x", "pos_y", "neg_y", "pos_z", "neg_z")]
+script = ExtResource("1_k3834")
+pos_x = NodePath("+x")
+neg_x = NodePath("-x")
+pos_y = NodePath("+y")
+neg_y = NodePath("-y")
+pos_z = NodePath("+z")
+neg_z = NodePath("-z")
+
+[node name="+y" type="Marker3D" parent="." unique_id=2122078191]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+
+[node name="+x" type="Marker3D" parent="." unique_id=1724204686]
+transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, 0.5, 0, 0)
+
+[node name="-x" type="Marker3D" parent="." unique_id=37982794]
+transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, -0.5, 0, 0)
+
+[node name="-y" type="Marker3D" parent="." unique_id=571533415]
+transform = Transform3D(-1, 8.742278e-08, 0, -8.742278e-08, -1, 0, 0, 0, 1, 0, -0.5, 0)
+
+[node name="-z" type="Marker3D" parent="." unique_id=1303712229]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, -0.5)
+
+[node name="+z" type="Marker3D" parent="." unique_id=372914451]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0.5)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=2137573967]
+shape = SubResource("CylinderShape3D_5j4jy")
+
+[node name="CollisionShape3D3" type="CollisionShape3D" parent="." unique_id=2015445571]
+transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
+shape = SubResource("CylinderShape3D_5j4jy")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="." unique_id=19399302]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
+shape = SubResource("CylinderShape3D_5j4jy")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=8767000]
+mesh = ExtResource("2_ae35o")

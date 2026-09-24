@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://l2rnp4oou3rm"]
+
+[ext_resource type="PackedScene" uid="uid://lu7mppvr18ay" path="res://models/simpleEnemy/simpleEnemy.gltf" id="2_b5wgn"]
+
+[node name="Player" type="Player" unique_id=1482492652 node_paths=PackedStringArray("model")]
+model = NodePath("blockbench_export")
+
+[node name="blockbench_export" parent="." unique_id=240855585 instance=ExtResource("2_b5wgn")]
+
+[node name="RayCast3D" type="RayCast3D" parent="blockbench_export" unique_id=934595553]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0.5, 0)
+target_position = Vector3(0, -2, 0)
+collide_with_areas = true

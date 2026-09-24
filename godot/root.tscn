@@ -1,0 +1,29 @@
+[gd_scene format=3 uid="uid://pewpc5rylayj"]
+
+[ext_resource type="PackedScene" uid="uid://dm5ft0kunyls6" path="res://Cube.tscn" id="1_pq8q7"]
+[ext_resource type="PackedScene" uid="uid://l2rnp4oou3rm" path="res://player_discrete.tscn" id="2_pyidc"]
+
+[node name="Root" type="Node3D" unique_id=375992101]
+
+[node name="Cube" parent="." unique_id=355907275 instance=ExtResource("1_pq8q7")]
+
+[node name="Cube2" parent="." unique_id=389881540 instance=ExtResource("1_pq8q7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0)
+
+[node name="Cube3" parent="." unique_id=1938752761 instance=ExtResource("1_pq8q7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, -1)
+
+[node name="Cube4" parent="." unique_id=1316594718 instance=ExtResource("1_pq8q7")]
+transform = Transform3D(1, 0, 0, 0, 0.96213186, -0.27258453, 0, 0.27258453, 0.96213186, 0, 0.15420794, -1)
+
+[node name="Cube5" parent="." unique_id=1865557438 instance=ExtResource("1_pq8q7")]
+transform = Transform3D(1, 0, 0, 0, 0.899607, -0.43670055, 0, 0.43670055, 0.899607, 0, 0.5378682, -2.0105982)
+
+[node name="Cube6" parent="." unique_id=381335605 instance=ExtResource("1_pq8q7")]
+transform = Transform3D(1, 0, 0, 0, 0.77754223, -0.62883073, 0, 0.62883073, 0.77754223, 0, 1.1321224, -2.9440863)
+
+[node name="Player" parent="." unique_id=1482492652 instance=ExtResource("2_pyidc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.60140383, 0)
+
+[node name="Camera3D" type="Camera3D" parent="Player" unique_id=757952422]
+transform = Transform3D(1, 0, 0, 0, 0.5951436, 0.8036194, 0, -0.8036194, 0.5951436, 0, 1.7824222, 0.7865454)
