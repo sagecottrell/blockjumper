@@ -1,3 +1,4 @@
+@tool
 class_name Cube
 extends Platform
 
@@ -11,6 +12,10 @@ extends Platform
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	pass # Replace with function body.
+
+func _positions() -> Array[Transform3D]:
+	var axes := [neg_x, pos_x, neg_y, pos_y, neg_z, pos_z]
+	return axes.map(func(x): return x.global_transform)
 
 func _get_anchor_transform(global_collision_point: Vector3) -> Transform3D:
 	var local := to_local(global_collision_point)
