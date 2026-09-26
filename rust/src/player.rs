@@ -23,7 +23,6 @@ struct Player {
     raycast: Option<Gd<RayCast3D>>,
 
     // runtime vars
-    up: Vector3,
     start_transform: Transform3D,
     target_transform: Transform3D,
     moving: bool,
@@ -36,8 +35,7 @@ impl INode3D for Player {
             time_to_move: 0.25,
             model: None,
             raycast: None,
-            up: Vector3::UP,
-            max_angle: PI / 8.0,
+            max_angle: PI / 12.0,
             start_transform: Transform3D::IDENTITY,
             target_transform: Transform3D::IDENTITY,
             moving: false,
@@ -62,42 +60,49 @@ impl INode3D for Player {
             return;
         }
 
+        let direction = Vector3::new(direction.x, 0., direction.y).normalized();
+
+        let up = self.base().get_global_basis().col_b();
+
         if let Some(mut model) = self.model.clone() {
-            let direction = Vector3::new(direction.x, 0., direction.y).normalized();
             model
                 .look_at_ex(self.base().to_global(direction))
-                .up(self.up)
+                .up(up)
                 .done();
-        }
 
-        if let Some(target_transform) = self.test_move() {
-            self.moving = true;
-            self.start_transform = self.base().get_global_transform();
-            self.target_transform = target_transform;
-            self.up = target_transform.basis.col_b();
-            let callable = self.base().callable("interpolate");
-            let time = self.time_to_move;
-            let tween = self
-                .base_mut()
-                .create_tween()
-                .tween_method(&callable, &0.0.to_variant(), &1.0.to_variant(), time)
-                .set_trans(tween::TransitionType::LINEAR);
+            if let Some(target_transform) = self.test_move() {
+                self.moving = true;
+                self.start_transform = self.base().get_global_transform();
+                self.target_transform = target_transform;
+                let callable = self.base().callable("interpolate");
+                let time = self.time_to_move;
+                let tween = self
+                    .base_mut()
+                    .create_tween()
+                    .tween_method(&callable, &0.0.to_variant(), &1.0.to_variant(), time)
+                    .set_trans(tween::TransitionType::LINEAR);
 
-            tween
-                .signals()
-                .finished()
-                .connect_other(self, Player::finish_interpolate);
+                tween
+                    .signals()
+                    .finished()
+                    .connect_other(self, Player::finish_interpolate);
+            }
         }
     }
 }
 
-
-
-static RAYCAST_TRANSFORMS : [Vector3;2] = [
-    Vector3 { x: 0.0, y: 0.5, z: 0.0 },
-    Vector3 { x: 0.0, y: 0.0, z: 0.0 }
+static RAYCAST_TRANSFORMS: [Vector3; 2] = [
+    Vector3 {
+        x: 0.0,
+        y: 0.5,
+        z: 0.0,
+    },
+    Vector3 {
+        x: 0.0,
+        y: 0.1,
+        z: 0.0,
+    },
 ];
-
 
 #[godot_api]
 impl Player {
@@ -120,6 +125,7 @@ impl Player {
     fn test_move(&mut self) -> Option<Transform3D> {
         match self.raycast.clone() {
             Some(mut raycast) => {
+                let up = self.base().get_global_basis().col_b();
                 for transform in RAYCAST_TRANSFORMS {
                     raycast.set_position(transform);
                     raycast.force_raycast_update();
@@ -127,11 +133,20 @@ impl Player {
                     if let Some(collider) = collider
                         && let Ok(platform) = collider.try_cast::<Platform>()
                     {
-                        let target_transform = platform
+                        let mut target_transform = platform
                             .bind()
                             .get_anchor_transform(raycast.get_collision_point());
-                        let is_close = target_transform.basis.col_b().angle_to(self.up) <= self.max_angle;
-                        return is_close.then_some(target_transform);
+                        let is_close =
+                            target_transform.basis.col_b().angle_to(up) <= self.max_angle;
+                        
+                        // rotate the transform until all the directions line up with our current rotation.
+                        // this is necessary because the anchor_transform up direction might be aligned with us, but not in any other directions.
+                        // the choice of col_a is arbitrary, col_c could also have been used.
+                        let a_direction = self.base().get_global_basis().col_a();
+                        while target_transform.basis.col_a().dot(a_direction) < 0.5 {
+                            target_transform.basis = target_transform.basis.rotated(target_transform.basis.col_b(), PI / 2.0);
+                        }
+                        if is_close { return Some(target_transform); }
                     }
                 }
                 None

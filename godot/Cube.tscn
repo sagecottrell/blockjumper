@@ -15,14 +15,14 @@ neg_y = NodePath("-y")
 pos_z = NodePath("+z")
 neg_z = NodePath("-z")
 
-[node name="+y" type="Marker3D" parent="." unique_id=2122078191]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
-
 [node name="+x" type="Marker3D" parent="." unique_id=1724204686]
 transform = Transform3D(-4.371139e-08, 1, 0, 4.371139e-08, 1.9106855e-15, 1, 1, 4.371139e-08, -4.371139e-08, 0.5, 0, 0)
 
 [node name="-x" type="Marker3D" parent="." unique_id=37982794]
 transform = Transform3D(-4.371139e-08, -1, 0, -4.371139e-08, 1.9106855e-15, 1, -1, 4.371139e-08, -4.371139e-08, -0.5, 0, 0)
+
+[node name="+y" type="Marker3D" parent="." unique_id=2122078191]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 
 [node name="-y" type="Marker3D" parent="." unique_id=571533415]
 transform = Transform3D(-1, 8.742278e-08, 0, -8.742278e-08, -1, 0, 0, 0, 1, 0, -0.5, 0)
