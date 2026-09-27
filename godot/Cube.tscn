@@ -8,6 +8,7 @@ height = 2.4
 radius = 0.4
 
 [node name="Cube" type="Platform" unique_id=1938752761 node_paths=PackedStringArray("pos_x", "neg_x", "pos_y", "neg_y", "pos_z", "neg_z")]
+block_kind = ExtResource("2_ae35o")
 script = ExtResource("1_k3834")
 pos_x = NodePath("+x")
 neg_x = NodePath("-x")
@@ -15,7 +16,6 @@ pos_y = NodePath("+y")
 neg_y = NodePath("-y")
 pos_z = NodePath("+z")
 neg_z = NodePath("-z")
-block_kind = ExtResource("2_ae35o")
 
 [node name="+x" type="Marker3D" parent="." unique_id=1724204686 groups=["MMFace"]]
 transform = Transform3D(-4.371139e-08, 1, 0, 4.371139e-08, 1.9106855e-15, 1, 1, 4.371139e-08, -4.371139e-08, 0.5, 0, 0)

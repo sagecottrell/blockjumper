@@ -3,16 +3,18 @@ use std::f32::consts::PI;
 use godot::{
     classes::{
         Camera3D, Control, DirectionalLight3D, EditorInspectorPlugin, EditorPlugin, IControl,
-        IEditorInspectorPlugin, IEditorPlugin, Label, Mesh, MultiMesh, MultiMeshInstance3D,
-        SubViewport, SubViewportContainer, control::LayoutPreset, multi_mesh::TransformFormat,
+        IEditorInspectorPlugin, IEditorPlugin, MultiMesh, MultiMeshInstance3D, SubViewport, SubViewportContainer, control::LayoutPreset,
+        multi_mesh::TransformFormat,
     },
     prelude::*,
     signal::ConnectHandle,
 };
 
+use crate::cube_side_mesh;
+
 #[derive(GodotClass)]
 #[class(tool, base=Resource)]
-struct BlockDefinition {
+pub(crate) struct BlockDefinition {
     base: Base<Resource>,
 
     #[export]
@@ -26,10 +28,6 @@ struct BlockDefinition {
     #[export]
     #[var(set=set_var_down)]
     down: Vector2i,
-
-    #[export]
-    #[var(set=set_var_mesh)]
-    mesh: Option<Gd<Mesh>>,
 }
 
 #[godot_api]
@@ -39,7 +37,6 @@ impl IResource for BlockDefinition {
             default: Vector2i::new(0, 2),
             up: Vector2i::default(),
             down: Vector2i::default(),
-            mesh: None,
             base,
         }
     }
@@ -48,7 +45,7 @@ impl IResource for BlockDefinition {
 #[godot_api]
 impl BlockDefinition {
     #[signal]
-    fn on_change_mesh(mesh: Option<Gd<Mesh>>);
+    fn on_change_mesh();
 
     #[func]
     fn set_var_default(&mut self, default: Vector2i) {
@@ -68,19 +65,12 @@ impl BlockDefinition {
         self.trigger_on_change();
     }
 
-    #[func]
-    fn set_var_mesh(&mut self, mesh: Option<Gd<Mesh>>) {
-        self.mesh = mesh.clone();
-        self.trigger_on_change();
-    }
-
     fn trigger_on_change(&mut self) {
-        let mesh = self.mesh.clone();
-        self.signals().on_change_mesh().emit(mesh.as_ref());
+        self.signals().on_change_mesh().emit();
     }
 
     #[func]
-    fn get_data_for_side(&self, name: String) -> Vector2i {
+    pub fn get_data_for_side(&self, name: String) -> Vector2i {
         match name.as_str() {
             "+y" => self.get_var_up(),
             "-y" => self.get_var_down(),
@@ -90,12 +80,20 @@ impl BlockDefinition {
 
     #[func]
     fn get_var_up(&self) -> Vector2i {
-        if self.up == Vector2i::default() { self.default } else { self.up }
+        if self.up == Vector2i::default() {
+            self.default
+        } else {
+            self.up
+        }
     }
 
     #[func]
     fn get_var_down(&self) -> Vector2i {
-        if self.down == Vector2i::default() { self.default } else { self.down }
+        if self.down == Vector2i::default() {
+            self.default
+        } else {
+            self.down
+        }
     }
 }
 
@@ -210,6 +208,8 @@ impl BlockDefResource3DPreviewControl {
         let mut multimesh = MultiMesh::new_gd();
         multimesh.set_use_custom_data(true);
         multimesh.set_transform_format(TransformFormat::TRANSFORM_3D);
+        multimesh.set_mesh(cube_side_mesh().as_ref());
+        multimesh.set_instance_count(6);
         self.mesh_instance = Some(multimesh.clone());
 
         mesh_instance.set_multimesh(Some(multimesh).as_ref());
@@ -225,7 +225,7 @@ impl BlockDefResource3DPreviewControl {
         }
 
         if let Some(ref mut resource) = resource.clone() {
-            self.set_mesh(resource.bind().mesh.clone());
+            self.set_mesh();
 
             let handle = resource
                 .bind_mut()
@@ -236,29 +236,40 @@ impl BlockDefResource3DPreviewControl {
         }
     }
 
-    fn set_mesh(&mut self, mesh: Option<Gd<Mesh>>) {
+    fn set_mesh(&mut self) {
         if let Some(mi) = &mut self.mesh_instance
             && let Some(resource) = &self.resource
         {
-            mi.set_instance_count(0);
-            mi.set_mesh(mesh.as_ref());
-            mi.set_instance_count(6);
-
             let default = resource.bind().default;
-            mi.set_instance_transform(0, Transform3D::default().translated(Vector3::new(0., 0., -1.)));
-            mi.set_instance_transform(1, Transform3D::default().translated(Vector3::new(-1., 0., 0.)));
-            mi.set_instance_transform(2, Transform3D::default().translated(Vector3::new(0., 0., 0.)));
-            mi.set_instance_transform(3, Transform3D::default().translated(Vector3::new(1., 0., 0.)));
-            mi.set_instance_transform(4, Transform3D::default().translated(Vector3::new(2., 0., 0.)));
-            mi.set_instance_transform(5, Transform3D::default().translated(Vector3::new(0., 0., 1.)));
-            
+            mi.set_instance_transform(
+                0,
+                Transform3D::default().translated(Vector3::new(0., 0., -1.)),
+            );
+            mi.set_instance_transform(
+                1,
+                Transform3D::default().translated(Vector3::new(-1., 0., 0.)),
+            );
+            mi.set_instance_transform(
+                2,
+                Transform3D::default().translated(Vector3::new(0., 0., 0.)),
+            );
+            mi.set_instance_transform(
+                3,
+                Transform3D::default().translated(Vector3::new(1., 0., 0.)),
+            );
+            mi.set_instance_transform(
+                4,
+                Transform3D::default().translated(Vector3::new(2., 0., 0.)),
+            );
+            mi.set_instance_transform(
+                5,
+                Transform3D::default().translated(Vector3::new(0., 0., 1.)),
+            );
+
             let up = resource.bind().get_var_up();
             let down = resource.bind().get_var_down();
 
-            mi.set_instance_custom_data(
-                0,
-                Color::from_rgba(up.x as f32, up.y as f32, 0., 0.),
-            );
+            mi.set_instance_custom_data(0, Color::from_rgba(up.x as f32, up.y as f32, 0., 0.));
             mi.set_instance_custom_data(
                 1,
                 Color::from_rgba(default.x as f32, default.y as f32, 0., 0.),
@@ -275,10 +286,7 @@ impl BlockDefResource3DPreviewControl {
                 4,
                 Color::from_rgba(default.x as f32, default.y as f32, 0., 0.),
             );
-            mi.set_instance_custom_data(
-                5,
-                Color::from_rgba(down.x as f32, down.y as f32, 0., 0.),
-            );
+            mi.set_instance_custom_data(5, Color::from_rgba(down.x as f32, down.y as f32, 0., 0.));
         }
     }
 }

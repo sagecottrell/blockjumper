@@ -4,11 +4,10 @@
 [ext_resource type="PackedScene" uid="uid://l2rnp4oou3rm" path="res://player_discrete.tscn" id="2_pyidc"]
 [ext_resource type="BlockDefinition" uid="uid://b2qg063b5qmx3" path="res://blockdefs/oak_planks.tres" id="2_vyht1"]
 [ext_resource type="Script" uid="uid://cqbwrxnrfkjp1" path="res://ProjectionTweener.gd" id="3_l8v81"]
-[ext_resource type="Script" uid="uid://bv8ic7oddmoh0" path="res://root.gd" id="3_vvh5c"]
 [ext_resource type="QuadMesh" uid="uid://b1msou15xpkdq" path="res://models/Cube/cube_side_mesh.tres" id="5_jnlp7"]
 [ext_resource type="Script" uid="uid://d0ba5cre5l8wt" path="res://circle_generator.gd" id="5_l8v81"]
 
-[sub_resource type="MultiMesh" id="MultiMesh_vyht1"]
+[sub_resource type="MultiMesh" id="MultiMesh_l8v81"]
 transform_format = 1
 use_custom_data = true
 instance_count = 720
@@ -69,52 +68,52 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 1)
 transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="Cube2" parent="Node3D3" unique_id=1028706928 instance=ExtResource("1_pq8q7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
 block_kind = ExtResource("2_vyht1")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
 
 [node name="Cube3" parent="Node3D3" unique_id=1829654973 instance=ExtResource("1_pq8q7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -1)
 block_kind = ExtResource("2_vyht1")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -1)
 
 [node name="Cube7" parent="Node3D3" unique_id=1363295037 instance=ExtResource("1_pq8q7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.5, -1)
 block_kind = ExtResource("2_vyht1")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.5, -1)
 
 [node name="Cube8" parent="Node3D3" unique_id=1586331052 instance=ExtResource("1_pq8q7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 1, -1)
 block_kind = ExtResource("2_vyht1")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 1, -1)
 
 [node name="Cube9" parent="Node3D3" unique_id=1739288185 instance=ExtResource("1_pq8q7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 1, -1)
 block_kind = ExtResource("2_vyht1")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 1, -1)
 
 [node name="Cube10" parent="Node3D3" unique_id=1537252694 instance=ExtResource("1_pq8q7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 1.5, -1)
 block_kind = ExtResource("2_vyht1")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 1.5, -1)
 
 [node name="Cube11" parent="Node3D3" unique_id=38111440 instance=ExtResource("1_pq8q7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 1.5, 0)
 block_kind = ExtResource("2_vyht1")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 1.5, 0)
 
 [node name="Cube12" parent="Node3D3" unique_id=1880073965 instance=ExtResource("1_pq8q7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 1.5, 1)
 block_kind = ExtResource("2_vyht1")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 1.5, 1)
 
 [node name="Cube13" parent="Node3D3" unique_id=1014594496 instance=ExtResource("1_pq8q7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 1.5, 1)
 block_kind = ExtResource("2_vyht1")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 1.5, 1)
 
 [node name="Cube14" parent="Node3D3" unique_id=259396824 instance=ExtResource("1_pq8q7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 1, 1)
 block_kind = ExtResource("2_vyht1")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 1, 1)
 
 [node name="Cube15" parent="Node3D3" unique_id=1553957929 instance=ExtResource("1_pq8q7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.5, 1)
 block_kind = ExtResource("2_vyht1")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.5, 1)
 
 [node name="Cube16" parent="Node3D3" unique_id=915937999 instance=ExtResource("1_pq8q7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 1)
 block_kind = ExtResource("2_vyht1")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 1)
 
 [node name="Node3D6" type="Node3D" parent="." unique_id=2143466056]
 transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
@@ -247,10 +246,9 @@ distance = 5.0
 [node name="OmniLight3D" type="OmniLight3D" parent="Player" unique_id=820876362]
 transform = Transform3D(1, 0, 0, 0, 0.5951436, 0.8036194, 0, -0.8036194, 0.5951436, 0, 1.2026677, 0.35719144)
 
-[node name="MultiMeshInstance3D" type="MultiMeshInstance3D" parent="." unique_id=551123789]
-multimesh = SubResource("MultiMesh_vyht1")
-script = ExtResource("3_vvh5c")
+[node name="MultiMeshInstance3D" type="FaceMultimesh" parent="." unique_id=889967820]
 update_live = true
+multimesh = SubResource("MultiMesh_l8v81")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=911493432]
 environment = SubResource("Environment_5j4jy")
