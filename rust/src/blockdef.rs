@@ -97,6 +97,13 @@ impl BlockDefinition {
     }
 }
 
+
+/// ==================================
+/// ==================================
+/// Editor Plugin
+/// ==================================
+/// ==================================
+
 #[derive(GodotClass)]
 #[class(tool, base=EditorPlugin)]
 struct BlockDefinitionEditorPlugin {

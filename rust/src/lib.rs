@@ -45,8 +45,8 @@ impl IArea3D for Platform {
 #[godot_api]
 impl Platform {
     #[func(virtual)]
-    fn get_anchor_transform(&self, _global_collision_point: Vector3) -> Transform3D {
-        self.base().get_global_transform()
+    fn get_anchor(&self, _global_collision_point: Vector3) -> Option<Gd<Node3D>> {
+        Some(self.to_gd().upcast::<Node3D>())
     }
 }
 
