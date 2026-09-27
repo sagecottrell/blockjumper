@@ -1,6 +1,7 @@
 use godot::{classes::{Area3D, IArea3D}, prelude::*};
 
 mod player;
+mod blockdef;
 
 struct MyExtension;
 

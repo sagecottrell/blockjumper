@@ -1,9 +1,10 @@
 shader_type spatial;
 
 uniform sampler2D image : filter_nearest;
+uniform int scale = 16;
 
 void vertex() {
-	UV = (INSTANCE_CUSTOM.xy + UV) * 0.03125;
+	UV = (INSTANCE_CUSTOM.xy + UV) / float(scale);
 }
 
 void fragment() {

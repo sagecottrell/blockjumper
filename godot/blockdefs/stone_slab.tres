@@ -1,0 +1,9 @@
+[gd_resource type="BlockDefinition" format=3 uid="uid://cctledx7orv21"]
+
+[ext_resource type="QuadMesh" uid="uid://b1msou15xpkdq" path="res://models/Cube/cube_side_mesh.tres" id="1_dxth6"]
+
+[resource]
+default = Vector2i(21, 0)
+up = Vector2i(21, 1)
+down = Vector2i(21, 1)
+mesh = ExtResource("1_dxth6")
