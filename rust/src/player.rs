@@ -24,6 +24,7 @@ struct Player {
 
     // runtime vars
     start_transform: Transform3D,
+    moving: bool,
     target: Option<Gd<Node3D>>,
     target_transform_correction: Transform3D,
 }
@@ -38,6 +39,7 @@ impl INode3D for Player {
             max_angle: PI / 12.0,
             start_transform: Transform3D::IDENTITY,
             target: None,
+            moving: false,
             target_transform_correction: Transform3D::IDENTITY,
             base,
         }
@@ -49,8 +51,13 @@ impl INode3D for Player {
     }
 
     fn physics_process(&mut self, _delta: f64) {
-        if self.target.is_some() {
+        if self.moving {
             return;
+        }
+            
+        if let Some(target) = self.target.clone() {
+            let tform = target.get_global_transform() * self.target_transform_correction;
+            self.base_mut().set_global_transform(tform);
         }
 
         let input = Input::singleton();
@@ -70,9 +77,11 @@ impl INode3D for Player {
                 .up(up)
                 .done();
 
-            if let Some(target) = self.test_move() {
+            if let Some((correction, target)) = self.test_move() {
+                self.moving = true;
                 self.start_transform = self.base().get_global_transform();
                 self.target = Some(target);
+                self.target_transform_correction = correction;
                 let callable = self.base().callable("interpolate");
                 let time = self.time_to_move;
                 let tween = self
@@ -118,10 +127,10 @@ impl Player {
     }
 
     fn finish_interpolate(&mut self) {
-        self.target = None;
+        self.moving = false;
     }
 
-    fn test_move(&mut self) -> Option<Gd<Node3D>> {
+    fn test_move(&self) -> Option<(Transform3D, Gd<Node3D>)> {
         match self.raycast.clone() {
             Some(mut raycast) => {
                 let up = self.base().get_global_basis().col_b();
@@ -138,6 +147,10 @@ impl Player {
                             .unwrap();
                         let is_close =
                             target.get_global_basis().col_b().angle_to(up) <= self.max_angle;
+                        
+                        if !is_close {
+                            continue;
+                        }
 
                         // rotate the transform until all the directions line up with our current rotation.
                         // this is necessary because the anchor_transform up direction might be aligned with us, but not in any other directions.
@@ -151,11 +164,7 @@ impl Player {
                                 .rotated(correction.basis.col_b(), PI / 2.0);
                         }
 
-                        self.target_transform_correction = correction;
-
-                        if is_close {
-                            return Some(target);
-                        }
+                        return Some((correction, target));
                     }
                 }
                 None
