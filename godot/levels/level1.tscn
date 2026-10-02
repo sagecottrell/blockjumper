@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://kl0t8fcnbwym"]
+
+[ext_resource type="PackedScene" uid="uid://ber58ul261534" path="res://models/jumper/blockjumper.gltf" id="1_sjb42"]
+
+[node name="Level1" type="Node3D" unique_id=346480120]
+
+[node name="blockbench_export" parent="." unique_id=525283053 instance=ExtResource("1_sjb42")]
+
+[editable path="blockbench_export"]

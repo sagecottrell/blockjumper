@@ -19,6 +19,9 @@ struct Player {
     #[export(range = (0.0, 90.0, radians_as_degrees))]
     max_angle: f32,
 
+    #[export]
+    rotators: Array<Gd<Node3D>>,
+
     // onready
     raycast: Option<Gd<RayCast3D>>,
 
@@ -41,6 +44,7 @@ impl INode3D for Player {
             target: None,
             moving: false,
             target_transform_correction: Transform3D::IDENTITY,
+            rotators: Array::new(),
             base,
         }
     }
@@ -54,7 +58,7 @@ impl INode3D for Player {
         if self.moving {
             return;
         }
-            
+
         if let Some(target) = self.target.clone() {
             let tform = target.get_global_transform() * self.target_transform_correction;
             self.base_mut().set_global_transform(tform);
@@ -72,12 +76,15 @@ impl INode3D for Player {
         let up = self.base().get_global_basis().col_b();
 
         if let Some(mut model) = self.model.clone() {
-            model
-                .look_at_ex(self.base().to_global(direction))
-                .up(up)
-                .done();
+            let d = self.base().to_global(direction);
+            for mut rotator in self.rotators.iter_shared() {
+                rotator.look_at_ex(d).up(up).done();
+            }
 
             if let Some((correction, target)) = self.test_move() {
+                model
+                    .bind_mut()
+                    .play_animation_with_length("jump".into(), self.time_to_move as f32);
                 self.moving = true;
                 self.start_transform = self.base().get_global_transform();
                 self.target = Some(target);
@@ -118,7 +125,8 @@ impl Player {
     fn interpolate(&mut self, weight: f32) {
         let basis = self.start_transform.basis;
         let origin = self.start_transform.origin;
-        let tbasis = self.target.as_ref().unwrap().get_global_basis() * self.target_transform_correction.basis;
+        let tbasis = self.target.as_ref().unwrap().get_global_basis()
+            * self.target_transform_correction.basis;
         let torigin = self.target.as_ref().unwrap().get_global_position();
         self.base_mut().set_global_transform(Transform3D {
             basis: basis.slerp(&tbasis, weight),
@@ -133,7 +141,7 @@ impl Player {
     fn test_move(&self) -> Option<(Transform3D, Gd<Node3D>)> {
         match self.raycast.clone() {
             Some(mut raycast) => {
-                let up = self.base().get_global_basis().col_b();
+                let up_dir = self.base().get_global_basis().col_b();
                 for transform in RAYCAST_TRANSFORMS {
                     raycast.set_position(transform);
                     raycast.force_raycast_update();
@@ -146,8 +154,8 @@ impl Player {
                             .get_anchor(raycast.get_collision_point())
                             .unwrap();
                         let is_close =
-                            target.get_global_basis().col_b().angle_to(up) <= self.max_angle;
-                        
+                            target.get_global_basis().col_b().angle_to(up_dir) <= self.max_angle;
+
                         if !is_close {
                             continue;
                         }
@@ -158,10 +166,14 @@ impl Player {
                         let a_direction = self.base().get_global_basis().col_a();
                         let target_transform = target.get_global_transform();
                         let mut correction = Transform3D::IDENTITY;
-                        while (target_transform * correction).basis.col_a().dot(a_direction) < 0.5 {
-                            correction.basis = correction
-                                .basis
-                                .rotated(correction.basis.col_b(), PI / 2.0);
+                        while (target_transform * correction)
+                            .basis
+                            .col_a()
+                            .dot(a_direction)
+                            < 0.5
+                        {
+                            correction.basis =
+                                correction.basis.rotated(correction.basis.col_b(), PI / 2.0);
                         }
 
                         return Some((correction, target));
