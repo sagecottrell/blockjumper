@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://c2bs48nnwxodw"]
+
+[ext_resource type="PackedScene" uid="uid://l2rnp4oou3rm" path="res://player_discrete.tscn" id="1_v6hf6"]
+[ext_resource type="Script" uid="uid://cqbwrxnrfkjp1" path="res://ProjectionTweener.gd" id="2_h517u"]
+[ext_resource type="QuadMesh" uid="uid://b1msou15xpkdq" path="res://models/Cube/cube_side_mesh.tres" id="3_uun7v"]
+
+[sub_resource type="MultiMesh" id="MultiMesh_pdpul"]
+transform_format = 1
+use_custom_data = true
+mesh = ExtResource("3_uun7v")
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_8hd6v"]
+ground_curve = 1e-05
+
+[sub_resource type="Sky" id="Sky_prsbl"]
+sky_material = SubResource("ProceduralSkyMaterial_8hd6v")
+
+[sub_resource type="Environment" id="Environment_045es"]
+background_mode = 2
+sky = SubResource("Sky_prsbl")
+
+[node name="Level1" type="Node3D" unique_id=346480120]
+
+[node name="Player" parent="." unique_id=1482492652 instance=ExtResource("1_v6hf6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 9.556168, 0)
+
+[node name="Camera3D" type="Camera3D" parent="Player" unique_id=1001585790]
+transform = Transform3D(1, 0, 0, 0, 0.5951436, 0.8036194, 0, -0.8036194, 0.5951436, 0, 4.0180974, 2.9757175)
+script = ExtResource("2_h517u")
+tween_time = 2.0
+persp_fov = 75.0
+persp_distance = 5.0
+distance = 5.0
+
+[node name="OmniLight3D" type="OmniLight3D" parent="Player" unique_id=490543584]
+transform = Transform3D(1, 0, 0, 0, 0.5951436, 0.8036194, 0, -0.8036194, 0.5951436, 0, 1.2026677, 0.35719144)
+
+[node name="MultiMeshInstance3D" type="FaceMultimesh" parent="." unique_id=687920328]
+update_live = true
+multimesh = SubResource("MultiMesh_pdpul")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=121822769]
+environment = SubResource("Environment_045es")
