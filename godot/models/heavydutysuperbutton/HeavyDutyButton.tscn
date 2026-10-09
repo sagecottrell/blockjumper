@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://te1iqexin2l7"]
+
+[ext_resource type="PackedScene" uid="uid://ci3a3642f1uf7" path="res://models/heavydutysuperbutton/heavydutysuperbutton.gltf" id="1_3mai3"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_5j4jy"]
+size = Vector3(0.8, 0.7, 0.8)
+
+[node name="HeavyDutyButton" type="HeavyDutyButton" unique_id=589779504]
+
+[node name="blockbench_export" parent="." unique_id=728896265 instance=ExtResource("1_3mai3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+
+[node name="Area3D" type="Area3D" parent="." unique_id=1711018949]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D" unique_id=1158730553]
+shape = SubResource("BoxShape3D_5j4jy")
+
+[connection signal="area_entered" from="Area3D" to="." method="on_pressed" unbinds=1]
+[connection signal="area_exited" from="Area3D" to="." method="on_released" unbinds=1]

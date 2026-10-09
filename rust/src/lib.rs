@@ -1,10 +1,12 @@
 use godot::{
-    classes::{AnimationPlayer, Area3D, IArea3D, Mesh, ResourceLoader},
+    classes::{AnimationPlayer, Area3D, IArea3D, Mesh, ResourceLoader, node::ProcessMode},
     prelude::*,
 };
 
 mod blockdef;
+mod components;
 mod facemultimesh;
+mod global_signals;
 mod player;
 
 struct MyExtension;
@@ -12,8 +14,11 @@ struct MyExtension;
 #[gdextension]
 unsafe impl ExtensionLibrary for MyExtension {}
 
+// ===================================================================================================
+// ===================================================================================================
+
 #[derive(GodotClass)]
-#[class(base=Node3D)]
+#[class(base=Node3D, tool)]
 struct GLTFImport {
     base: Base<Node3D>,
     anim_lib: Option<Gd<AnimationPlayer>>,
@@ -57,6 +62,9 @@ impl GLTFImport {
     }
 }
 
+// ===================================================================================================
+// ===================================================================================================
+
 #[derive(GodotClass)]
 #[class(tool, base=Area3D)]
 struct Platform {
@@ -83,9 +91,101 @@ impl Platform {
     }
 }
 
+// ===================================================================================================
+//
+// ===================================================================================================
+
 pub fn cube_side_mesh() -> Option<Gd<Mesh>> {
-    ResourceLoader::singleton()
-        .load("uid://b1msou15xpkdq")?
-        .try_cast::<Mesh>()
-        .ok()
+    try_load("uid://b1msou15xpkdq")
 }
+
+pub fn try_load<T: GodotClass>(uid: &str) -> Option<Gd<T>>
+where
+    T: Inherits<Resource>,
+{
+    ResourceLoader::singleton().load(uid)?.try_cast::<T>().ok()
+}
+
+// ===================================================================================================
+// Activation Range
+// ===================================================================================================
+
+#[derive(GodotClass)]
+#[class(base=Area3D)]
+struct ActivationRange {
+    active: bool,
+    base: Base<Area3D>,
+}
+
+#[godot_api]
+impl IArea3D for ActivationRange {
+    fn init(base: Base<Area3D>) -> Self {
+        Self {
+            base,
+            active: false,
+        }
+    }
+
+    fn ready(&mut self) {
+        self.base_mut().set_process_mode(ProcessMode::PAUSABLE);
+        self.base_mut().set_monitorable(false);
+        let s = self.to_gd();
+        self.base_mut()
+            .signals()
+            .body_entered()
+            .connect_other(&s.clone(), Self::on_enter);
+        self.base_mut()
+            .signals()
+            .body_exited()
+            .connect_other(&s.clone(), Self::on_exit);
+    }
+}
+
+#[godot_api]
+impl ActivationRange {
+    #[signal]
+    fn activated();
+
+    #[signal]
+    fn deactivated();
+
+    #[func]
+    fn on_enter(&mut self, _body: Gd<Node3D>) {
+        self.activate();
+    }
+
+    #[func]
+    fn on_exit(&mut self, _body: Gd<Node3D>) {
+        self.deactivate();
+    }
+
+    #[func]
+    fn activate(&mut self) {
+        if self.active {
+            return;
+        }
+        self.active = true;
+        self.signals().activated();
+    }
+
+    #[func]
+    fn deactivate(&mut self) {
+        if !self.active {
+            return;
+        }
+        self.active = false;
+        self.signals().deactivated();
+    }
+
+    #[func]
+    fn toggle(&mut self) {
+        if self.active {
+            self.deactivate();
+        } else {
+            self.activate();
+        }
+    }
+}
+
+// ===================================================================================================
+// ===================================================================================================

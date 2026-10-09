@@ -69,3 +69,7 @@ func _to_perspective():
 		return
 	var tween := create_tween().set_trans(Tween.TRANS_CIRC)
 	tween.tween_property(self, "distance", persp_distance, tween_time)
+
+
+func _on_heavy_duty_button_pressed() -> void:
+	pass # Replace with function body.
