@@ -2,23 +2,9 @@
 
 [ext_resource type="PackedScene" uid="uid://ber58ul261534" path="res://models/jumper/blockjumper.gltf" id="1_bi82h"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_bi82h"]
-size = Vector3(0.8, 0.7, 0.8)
-
-[sub_resource type="GDScript" id="GDScript_bi82h"]
-resource_name = "hintdisplay"
-script/source = "extends RichTextLabel
-
-
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	pass
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
-"
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_pdpul"]
+height = 1.05
+radius = 0.3
 
 [node name="Player" type="Player" unique_id=1482492652 node_paths=PackedStringArray("model", "rotators")]
 model = NodePath("rotator/blockbench_export")
@@ -41,15 +27,5 @@ collision_mask = 0
 monitoring = false
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D" unique_id=117793280]
-shape = SubResource("BoxShape3D_bi82h")
-
-[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1304956740]
-offset_right = 1152.0
-offset_bottom = 648.0
-
-[node name="HintDisplay" type="RichTextLabel" parent="MarginContainer" unique_id=609148033]
-layout_mode = 2
-bbcode_enabled = true
-horizontal_alignment = 1
-vertical_alignment = 1
-script = SubResource("GDScript_bi82h")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.024999976, 0)
+shape = SubResource("CylinderShape3D_pdpul")

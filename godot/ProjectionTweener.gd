@@ -25,8 +25,11 @@ enum Mode {
 
 @export_range(1, 10) var ortho_multiplier : float = 1.0:
 	set(value):
-		_set_distance(_distance, value)
-		ortho_multiplier = value
+		if not is_inside_tree():
+			ortho_multiplier = value
+		else:
+			_set_distance(_distance, value)
+			ortho_multiplier = value
 
 var start_fov : float
 var start_dist : float

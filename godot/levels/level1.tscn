@@ -34,21 +34,19 @@ func onpress():
 
 [node name="Level1" type="Node3D" unique_id=346480120]
 
-[node name="Player" parent="." unique_id=1482492652 instance=ExtResource("1_b3oru")]
+[node name="PlayerSpawner" type="PlayerSpawner" parent="." unique_id=256587168]
+player_scene = ExtResource("1_b3oru")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 9.556168, 0)
 
-[node name="Camera3D" type="Camera3D" parent="Player" unique_id=1001585790]
-transform = Transform3D(1, 0, 0, 0, 0.47020897, 0.88255507, 0, -0.88255507, 0.47020897, 0, 198.75519, 104.69848)
-fov = 1.0
+[node name="Camera3D" type="Camera3D" parent="PlayerSpawner" unique_id=1001585790]
+transform = Transform3D(1, 0, 0, 0, 0.470209, 0.8825551, 0, -0.8825551, 0.470209, 0, 2.8274293, 0.31182444)
 script = ExtResource("2_ua5ty")
-mode = 1
 tween_time = 2.0
 persp_fov = 75.0
 persp_distance = 3.0
-distance = 225.0
 
-[node name="OmniLight3D" type="OmniLight3D" parent="Player" unique_id=490543584]
-transform = Transform3D(1, 0, 0, 0, 0.5951436, 0.8036194, 0, -0.8036194, 0.5951436, 0, 3.4683356, 1.6543388)
+[node name="OmniLight3D" type="OmniLight3D" parent="PlayerSpawner" unique_id=490543584]
+transform = Transform3D(1, 0, 0, 0, 0.5951436, 0.8036194, 0, -0.8036194, 0.5951436, 0, 3.468336, 1.6543388)
 omni_range = 25.9659
 omni_attenuation = -0.418
 
@@ -204,8 +202,87 @@ block_kind = ExtResource("5_61w3m")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 9, -5)
 
 [node name="HeavyDutyButton" parent="." unique_id=589779504 instance=ExtResource("6_pdpul")]
-toggle_on_press = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 9, 0)
 script = SubResource("GDScript_bi82h")
 
+[node name="HeavyDutyButton2" parent="." unique_id=195967279 instance=ExtResource("6_pdpul")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 9, -1)
+script = SubResource("GDScript_bi82h")
+
+[node name="HeavyDutyButton3" parent="." unique_id=2074214155 instance=ExtResource("6_pdpul")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 9, -2)
+script = SubResource("GDScript_bi82h")
+
+[node name="HeavyDutyButton4" parent="." unique_id=1088586334 instance=ExtResource("6_pdpul")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 9, -1)
+script = SubResource("GDScript_bi82h")
+
+[node name="HeavyDutyButton5" parent="." unique_id=1482961646 instance=ExtResource("6_pdpul")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 9, -1)
+script = SubResource("GDScript_bi82h")
+
+[node name="HeavyDutyButton6" parent="." unique_id=2125201772 instance=ExtResource("6_pdpul")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 9, -2)
+script = SubResource("GDScript_bi82h")
+
+[node name="HeavyDutyButton7" parent="." unique_id=74758163 instance=ExtResource("6_pdpul")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 9, -2)
+script = SubResource("GDScript_bi82h")
+
+[node name="HeavyDutyButton8" parent="." unique_id=2036428238 instance=ExtResource("6_pdpul")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 9, -1)
+script = SubResource("GDScript_bi82h")
+
+[node name="HeavyDutyButton9" parent="." unique_id=631005225 instance=ExtResource("6_pdpul")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 9, 0)
+script = SubResource("GDScript_bi82h")
+
+[node name="HeavyDutyButton10" parent="." unique_id=2086462916 instance=ExtResource("6_pdpul")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 9, 0)
+script = SubResource("GDScript_bi82h")
+
+[node name="HeavyDutyButton11" parent="." unique_id=742142387 instance=ExtResource("6_pdpul")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 9, 0)
+script = SubResource("GDScript_bi82h")
+
+[node name="HeavyDutyButton12" parent="." unique_id=1595931365 instance=ExtResource("6_pdpul")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 9, -2)
+script = SubResource("GDScript_bi82h")
+
+[node name="HeavyDutyButton13" parent="." unique_id=943394605 instance=ExtResource("6_pdpul")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 9, -3)
+script = SubResource("GDScript_bi82h")
+
+[node name="HeavyDutyButton14" parent="." unique_id=961003253 instance=ExtResource("6_pdpul")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 9, -3)
+script = SubResource("GDScript_bi82h")
+
+[node name="HeavyDutyButton15" parent="." unique_id=1170273544 instance=ExtResource("6_pdpul")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 9, -3)
+script = SubResource("GDScript_bi82h")
+
+[node name="HeavyDutyButton16" parent="." unique_id=1122612671 instance=ExtResource("6_pdpul")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 9, -3)
+script = SubResource("GDScript_bi82h")
+
+[node name="HeavyDutyButton17" parent="." unique_id=969023461 instance=ExtResource("6_pdpul")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 9, -5)
+script = SubResource("GDScript_bi82h")
+
 [connection signal="pressed" from="HeavyDutyButton" to="HeavyDutyButton" method="onpress"]
+[connection signal="pressed" from="HeavyDutyButton2" to="HeavyDutyButton2" method="onpress"]
+[connection signal="pressed" from="HeavyDutyButton3" to="HeavyDutyButton3" method="onpress"]
+[connection signal="pressed" from="HeavyDutyButton4" to="HeavyDutyButton4" method="onpress"]
+[connection signal="pressed" from="HeavyDutyButton5" to="HeavyDutyButton5" method="onpress"]
+[connection signal="pressed" from="HeavyDutyButton6" to="HeavyDutyButton6" method="onpress"]
+[connection signal="pressed" from="HeavyDutyButton7" to="HeavyDutyButton7" method="onpress"]
+[connection signal="pressed" from="HeavyDutyButton8" to="HeavyDutyButton8" method="onpress"]
+[connection signal="pressed" from="HeavyDutyButton9" to="HeavyDutyButton9" method="onpress"]
+[connection signal="pressed" from="HeavyDutyButton10" to="HeavyDutyButton10" method="onpress"]
+[connection signal="pressed" from="HeavyDutyButton11" to="HeavyDutyButton11" method="onpress"]
+[connection signal="pressed" from="HeavyDutyButton12" to="HeavyDutyButton12" method="onpress"]
+[connection signal="pressed" from="HeavyDutyButton13" to="HeavyDutyButton13" method="onpress"]
+[connection signal="pressed" from="HeavyDutyButton14" to="HeavyDutyButton14" method="onpress"]
+[connection signal="pressed" from="HeavyDutyButton15" to="HeavyDutyButton15" method="onpress"]
+[connection signal="pressed" from="HeavyDutyButton16" to="HeavyDutyButton16" method="onpress"]
+[connection signal="pressed" from="HeavyDutyButton17" to="HeavyDutyButton17" method="onpress"]

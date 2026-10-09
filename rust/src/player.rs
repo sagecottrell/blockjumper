@@ -9,7 +9,7 @@ use crate::{GLTFImport, Platform};
 
 #[derive(GodotClass)]
 #[class(base=Node3D)]
-struct Player {
+pub struct Player {
     base: Base<Node3D>,
 
     #[export]

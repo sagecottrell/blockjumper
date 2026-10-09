@@ -2,12 +2,13 @@ use godot::{
     classes::{
         Engine, MeshInstance3D, QuadMesh, StandardMaterial3D, Texture2D,
         base_material_3d::{BillboardMode, ShadingMode, TextureFilter, TextureParam, Transparency},
+        node::ProcessMode,
         notify::Node3DNotification,
     },
     prelude::*,
 };
 
-use crate::GLTFImport;
+use crate::{GLTFImport, player::Player};
 
 #[derive(GodotClass)]
 #[class(base=Node3D, internal, tool)]
@@ -172,6 +173,65 @@ impl HeavyDutyButton {
         self.pressed = self.pressed.saturating_sub(1);
         if is_pressed {
             self.release();
+        }
+    }
+}
+
+// =====================================================================================
+// // =====================================================================================
+
+#[derive(GodotClass)]
+#[class(tool, base=Node3D)]
+struct PlayerSpawner {
+    #[export]
+    #[var(set=set_player_scene)]
+    player_scene: Option<Gd<PackedScene>>,
+    base: Base<Node3D>,
+}
+
+#[godot_api]
+impl INode3D for PlayerSpawner {
+    fn init(base: Base<Node3D>) -> Self {
+        Self {
+            base,
+            player_scene: None,
+        }
+    }
+
+    fn ready(&mut self) {
+        if Engine::singleton().is_editor_hint() {
+            return;
+        }
+
+        if let Some(scene) = self.player_scene.clone() {
+            let mut instance: Gd<Player> = scene.instantiate_as();
+            self.base()
+                .get_parent_node_3d()
+                .unwrap()
+                .call_deferred("add_child", &[instance.clone().to_variant()]);
+            instance.set_transform(self.base().get_transform());
+            for mut child in self.base_mut().get_children().iter_shared() {
+                let dup = child.duplicate_node();
+                child.set_process_mode(ProcessMode::DISABLED);
+                instance.call_deferred("add_child", &[dup.to_variant()]);
+            }
+        }
+    }
+}
+
+#[godot_api]
+impl PlayerSpawner {
+    #[func]
+    fn set_player_scene(&mut self, scene: Option<Gd<PackedScene>>) {
+        self.player_scene = scene.clone();
+        if Engine::singleton().is_editor_hint() {
+            if let Some(mut child) = self.base_mut().find_child_ex("player").owned(false).done() {
+                child.queue_free();
+            }
+            if let Some(scene) = scene.clone() {
+                let instance: Gd<Player> = scene.instantiate_as();
+                self.base_mut().add_child(&instance.upcast::<Node>());
+            }
         }
     }
 }
