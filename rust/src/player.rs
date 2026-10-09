@@ -130,7 +130,7 @@ impl Player {
         let torigin = self.target.as_ref().unwrap().get_global_position();
         self.base_mut().set_global_transform(Transform3D {
             basis: basis.slerp(&tbasis, weight),
-            origin: origin.slerp(torigin, weight),
+            origin: origin.lerp(torigin, weight),
         });
     }
 
