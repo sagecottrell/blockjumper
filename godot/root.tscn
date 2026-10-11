@@ -260,6 +260,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.857182, 0, 0)
 script = ExtResource("5_l8v81")
 scene = ExtResource("1_pq8q7")
 segment_count = 30
+s = Signal()
 twist = 1.5707963267948966
 offset_amount = 0.1
 
@@ -271,5 +272,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.857182, 0, 0)
 script = ExtResource("5_l8v81")
 scene = ExtResource("1_pq8q7")
 segment_count = 30
+s = null
 twist = 1.5707963267948966
 offset_amount = 0.1

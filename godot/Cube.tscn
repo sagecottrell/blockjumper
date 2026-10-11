@@ -5,7 +5,6 @@
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_5j4jy"]
 height = 2.4
-radius = 0.4
 
 [node name="Cube" type="Platform" unique_id=1938752761 node_paths=PackedStringArray("pos_x", "neg_x", "pos_y", "neg_y", "pos_z", "neg_z")]
 block_kind = ExtResource("2_ae35o")

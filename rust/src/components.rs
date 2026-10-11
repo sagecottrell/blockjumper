@@ -1,6 +1,7 @@
 use godot::{
     classes::{
-        Engine, MeshInstance3D, QuadMesh, StandardMaterial3D, Texture2D,
+        Engine, IPathFollow3D, MeshInstance3D, Path3D, PathFollow3D, QuadMesh, StandardMaterial3D,
+        Texture2D, Tween,
         base_material_3d::{BillboardMode, ShadingMode, TextureFilter, TextureParam, Transparency},
         node::ProcessMode,
         notify::Node3DNotification,
@@ -237,3 +238,233 @@ impl PlayerSpawner {
 }
 
 //
+#[derive(GodotClass)]
+#[class(tool, base=PathFollow3D)]
+struct TweenController {
+    #[export]
+    forward_speed: f32,
+    #[export]
+    wait_one: f32,
+    #[export]
+    back_on_disable: bool,
+    #[export]
+    back_speed: f32,
+    #[export]
+    wait_two: f32,
+    #[export]
+    loops: i32,
+
+    #[export]
+    #[var(set=set_start_activated)]
+    start_activated: bool,
+
+    tween: Option<Gd<Tween>>,
+
+    base: Base<PathFollow3D>,
+}
+
+#[godot_api]
+impl IPathFollow3D for TweenController {
+    fn init(base: Base<PathFollow3D>) -> Self {
+        Self {
+            base,
+            forward_speed: 1.,
+            wait_one: 0.,
+            back_on_disable: false,
+            back_speed: -1.,
+            wait_two: -1.0,
+            loops: -1,
+            start_activated: false,
+            tween: None,
+        }
+    }
+
+    fn ready(&mut self) {
+        if self.start_activated {
+            self.activate();
+        }
+    }
+
+    fn on_notification(&mut self, what: Node3DNotification) {
+        match what {
+            Node3DNotification::EDITOR_PRE_SAVE => {
+                self.reset();
+            }
+            _ => {}
+        }
+    }
+}
+
+#[godot_api]
+impl TweenController {
+    #[signal]
+    fn activated();
+
+    #[signal]
+    fn deactivated();
+
+    #[func]
+    fn interpolate(&mut self, weight: f32) {
+        self.base_mut().set_progress_ratio(weight);
+    }
+
+    #[func]
+    fn set_start_activated(&mut self, start_active: bool) {
+        self.start_activated = start_active;
+        if Engine::singleton().is_editor_hint() {
+            if start_active {
+                self.activate();
+            } else {
+                self.reset();
+            }
+        }
+    }
+
+    #[func]
+    fn activate(&mut self) {
+        self.clean_tween();
+        let mut tween = self.base_mut().create_tween();
+        self.forward(&mut tween);
+        if !self.back_on_disable {
+            self.backward(&mut tween, 1.0);
+            if self.loops < 0 {
+                tween.set_loops();
+            } else if self.loops > 0 {
+                tween.set_loops_ex().loops(self.loops).done();
+            }
+        }
+        self.tween = Some(tween);
+        self.signals().activated().emit();
+    }
+
+    #[func]
+    fn deactivate(&mut self) {
+        self.clean_tween();
+        if !self.back_on_disable {
+            return;
+        }
+
+        let mut tween = self.base_mut().create_tween();
+        self.backward(&mut tween, self.base().get_progress_ratio());
+        self.tween = Some(tween);
+        self.signals().deactivated().emit();
+    }
+
+    #[func]
+    fn reset(&mut self) {
+        self.clean_tween();
+        self.interpolate(0.0);
+    }
+
+    fn clean_tween(&mut self) {
+        if let Some(mut tween) = self.tween.clone()
+            && tween.is_valid()
+        {
+            tween.kill();
+        }
+        self.tween = None;
+    }
+
+    fn get_curve_len(&self) -> Option<f32> {
+        Some(
+            self.base()
+                .get_parent_node_3d()?
+                .try_cast::<Path3D>()
+                .ok()?
+                .get_curve()?
+                .get_baked_length(),
+        )
+    }
+
+    fn forward(&self, tween: &mut Gd<Tween>) {
+        let interp = self.base().callable("interpolate");
+        let one = 1.0.to_variant();
+        let zero = self.base().get_progress_ratio().to_variant();
+        if let Some(len) = self.get_curve_len() {
+            let time = ((len - self.base().get_progress()) / self.forward_speed) as f64;
+            tween.tween_method(&interp, &zero, &one, time);
+
+            if self.wait_one > 0. {
+                tween.tween_interval(self.wait_one as f64);
+            }
+        }
+    }
+
+    fn backward(&self, tween: &mut Gd<Tween>, ratio: f32) {
+        let interp = self.base().callable("interpolate");
+        let one = ratio.to_variant();
+        let zero = 0.0.to_variant();
+        if let Some(len) = self.get_curve_len() {
+            let mut back_speed = self.back_speed;
+            if back_speed == -1.0 {
+                back_speed = self.forward_speed;
+            }
+            if back_speed > 0. {
+                let dist = len * ratio;
+                let time = (dist / back_speed) as f64;
+                tween.tween_method(&interp, &one, &zero, time);
+            }
+
+            let mut wait_two = self.wait_two;
+            if wait_two < 0. {
+                wait_two = self.wait_one;
+            }
+            if wait_two > 0. {
+                tween.tween_interval(wait_two as f64);
+            }
+        }
+    }
+}
+
+#[derive(GodotClass)]
+#[class(tool, base=Node)]
+struct Enabler {
+    #[export]
+    start_enabled: bool,
+    base: Base<Node>,
+}
+
+#[godot_api]
+impl INode for Enabler {
+    fn init(base: Base<Node>) -> Self {
+        Self {
+            base,
+            start_enabled: true,
+        }
+    }
+
+    fn ready(&mut self) {
+        if self.start_enabled {
+            self.enable();
+        } else {
+            self.disable();
+        }
+    }
+}
+
+#[godot_api]
+impl Enabler {
+    #[signal]
+    fn enabled();
+
+    #[signal]
+    fn disabled();
+
+    #[func]
+    fn enable(&mut self) {
+        self.base()
+            .get_parent()
+            .unwrap()
+            .set_process_mode(ProcessMode::INHERIT);
+        self.signals().enabled().emit();
+    }
+
+    #[func]
+    fn disable(&mut self) {
+        self.base()
+            .get_parent()
+            .unwrap()
+            .set_process_mode(ProcessMode::DISABLED);
+        self.signals().disabled().emit();
+    }
+}
