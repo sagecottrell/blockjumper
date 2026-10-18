@@ -29,3 +29,4 @@ monitoring = false
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D" unique_id=117793280]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.024999976, 0)
 shape = SubResource("CylinderShape3D_pdpul")
+debug_color = Color(0.99999994, 0.004837718, 0.085377716, 0.41960785)

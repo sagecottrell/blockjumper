@@ -1,6 +1,0 @@
-[gd_resource type="BlockDefinition" format=3 uid="uid://cctledx7orv21"]
-
-[resource]
-default = Vector2i(21, 0)
-up = Vector2i(21, 1)
-down = Vector2i(21, 1)

@@ -3,9 +3,7 @@ use godot::{
     prelude::*,
 };
 
-mod blockdef;
 mod components;
-mod facemultimesh;
 mod global_signals;
 mod player;
 
@@ -68,18 +66,13 @@ impl GLTFImport {
 #[derive(GodotClass)]
 #[class(tool, base=Area3D)]
 struct Platform {
-    #[export]
-    block_kind: Option<Gd<blockdef::BlockDefinition>>,
     base: Base<Area3D>,
 }
 
 #[godot_api]
 impl IArea3D for Platform {
     fn init(base: Base<Area3D>) -> Self {
-        Self {
-            block_kind: None,
-            base,
-        }
+        Self { base }
     }
 }
 

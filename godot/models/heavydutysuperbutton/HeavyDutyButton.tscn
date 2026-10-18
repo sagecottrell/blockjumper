@@ -9,10 +9,10 @@ radius = 0.3
 [node name="HeavyDutyButton" type="HeavyDutyButton" unique_id=589779504]
 
 [node name="blockbench_export" parent="." unique_id=728896265 instance=ExtResource("1_3mai3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, 0.5)
 
 [node name="Area3D" type="Area3D" parent="." unique_id=1711018949]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0.5, 0.5)
 collision_layer = 0
 collision_mask = 2
 monitorable = false

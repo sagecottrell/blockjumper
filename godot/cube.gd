@@ -1,17 +1,17 @@
 @tool
 class_name Cube
-extends Platform
+extends Area3D
 
-@export var pos_x : Marker3D
-@export var neg_x : Marker3D
-@export var pos_y : Marker3D
-@export var neg_y : Marker3D
-@export var pos_z : Marker3D
-@export var neg_z : Marker3D
+@export_range(1, 100) var right : int
+@export_range(1, 100) var left : int
+@export_range(1, 100) var up : int
+@export_range(1, 100) var down : int
+@export_range(1, 100) var back : int
+@export_range(1, 100) var fwd : int
 
 func _get_anchor(global_collision_point: Vector3) -> Node3D:
 	var local := to_local(global_collision_point)
-	var axes := [[neg_x, pos_x], [neg_y, pos_y], [neg_z, pos_z]]
+	var axes := [[left, right], [down, up], [fwd, back]]
 	var i := local.abs().max_axis_index()
 	var b : Marker3D = axes[i][(sign(local[i]) + 1) / 2]
 	return b

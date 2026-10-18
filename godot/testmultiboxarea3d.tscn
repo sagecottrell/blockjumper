@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://b6e601mgrxiip"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_5j4jy"]
+
+[sub_resource type="GDScript" id="GDScript_3uncl"]
+resource_name = "turn"
+script/source = "extends RayCast3D
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	var m = get_viewport().get_mouse_position().x
+	var width = get_viewport().get_window().size[0]
+	var f = m / width
+	rotation.y = f * 2 * PI
+	
+	
+"
+
+[node name="Node3D" type="Node3D" unique_id=1156470721]
+
+[node name="Area3D" type="Area3D" parent="." unique_id=2032833216]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D" unique_id=500721687]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 0)
+shape = SubResource("BoxShape3D_5j4jy")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="Area3D" unique_id=528847815]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0)
+shape = SubResource("BoxShape3D_5j4jy")
+
+[node name="RayCast3D" type="RayCast3D" parent="." unique_id=2083755964]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0)
+target_position = Vector3(4, 0, 0)
+collide_with_areas = true
+debug_shape_thickness = 5
+script = SubResource("GDScript_3uncl")
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=161854626]
+transform = Transform3D(1, 0, 0, 0, 0.8859765, 0.4637302, 0, -0.4637302, 0.8859765, 0, 1.2007713, 1.7886566)
