@@ -6,8 +6,14 @@
 [ext_resource type="Material" path="res://materials/woodherringbone.tres" id="7_lf3p4"]
 [ext_resource type="Script" uid="uid://cp01tx4fxrgim" path="res://addons/unibuilder/nodes/ub_mesh_instance.gd" id="7_omn1t"]
 [ext_resource type="Script" uid="uid://dyj0rf32exito" path="res://addons/unibuilder/core/ub_face.gd" id="8_lf3p4"]
+[ext_resource type="PackedScene" uid="uid://dt0r2ym10casc" path="res://models/spiketrap/spiketrap.tscn" id="9_lf3p4"]
 [ext_resource type="Script" uid="uid://ox8eicf01gw" path="res://UBArea3DContainer.gd" id="9_omn1t"]
 [ext_resource type="Script" uid="uid://dnaqomcyqdloo" path="res://addons/unibuilder/core/ub_mesh_data.gd" id="9_yydhl"]
+[ext_resource type="PackedScene" uid="uid://dgsbiw80q0aiv" path="res://models/checkpoint/checkpoint.tscn" id="11_yydhl"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_prsbl"]
+height = 1.0
+radius = 0.3
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_8hd6v"]
 ground_curve = 1e-05
@@ -414,6 +420,72 @@ color_corners = PackedColorArray()
 script = ExtResource("9_yydhl")
 positions = PackedVector3Array(-4, 1, -2, 4, 1, -2, 4, 1, 2, -4, 1, 2, -4, 2, -2, 4, 2, -2, 4, 2, 2, -4, 2, 2)
 faces = Array[ExtResource("8_lf3p4")]([SubResource("Resource_f7u7y"), SubResource("Resource_jq2cn"), SubResource("Resource_a5s8o"), SubResource("Resource_ls4ot"), SubResource("Resource_tx362"), SubResource("Resource_l7nqg")])
+material_slots = Array[Material]([null, ExtResource("7_lf3p4")])
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_ls4ot"]
+lightmap_size_hint = Vector2i(42, 42)
+_surfaces = [{
+"aabb": AABB(-4, 1, 0, 5, 1, 2),
+"attribute_data": PackedByteArray("/////wAAgD8AAAAAMQxDPJIkyT7/////AACAwAAAAAC3bRs/kiTJPv////8AAIDAAAAAwLdtGz89zzM//////wAAgD8AAADAMQxDPD3PMz//////AACAwAAAAEAxDEM8SZKkPv////8AAIDAAAAAADEMQzwxDEM8/////wAAgD8AAAAAt20bPzEMQzz/////AACAPwAAAEC3bRs/SZKkPv////8AAIBAAAAAwLdtGz9JkmQ//////wAAgEAAAIC/t20bP2IYRj//////AACAvwAAgL8xDEM8YhhGP/////8AAIC/AAAAwDEMQzxJkmQ//////wAAgD8AAADAwzBMP7dtGz//////AACAPwAAgL/bti0/t20bP/////8AAIDAAACAv9u2LT8xDEM8/////wAAgMAAAADAwzBMPzEMQzz/////AAAAAAAAAMDbti0/27YtP/////8AAAAAAACAv8MwTD/bti0//////wAAAMAAAIC/wzBMP8/zfD//////AAAAwAAAAMDbti0/z/N8P/////8AAABAAACAv8/zfD9JkqQ+/////wAAAAAAAIC/z/N8PzEMQzz/////AAAAAAAAAMDoeV4/MQxDPP////8AAABAAAAAwOh5Xj9JkqQ+"),
+"format": 34359742527,
+"index_count": 36,
+"index_data": PackedByteArray("AAABAAIAAgADAAAABAAFAAYABgAHAAQACAAJAAoACgALAAgADAANAA4ADgAPAAwAEAARABIAEgATABAAFAAVABYAFgAXABQA"),
+"material": ExtResource("7_lf3p4"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 24,
+"vertex_data": PackedByteArray("AACAPwAAgD8AAAAAAACAwAAAgD8AAAAAAACAwAAAgD8AAABAAACAPwAAgD8AAABAAACAwAAAAEAAAABAAACAwAAAAEAAAAAAAACAPwAAAEAAAAAAAACAPwAAAEAAAABAAACAwAAAAEAAAAAAAACAwAAAgD8AAAAAAACAPwAAgD8AAAAAAACAPwAAAEAAAAAAAACAPwAAAEAAAABAAACAPwAAgD8AAABAAACAwAAAgD8AAABAAACAwAAAAEAAAABAAACAPwAAAEAAAAAAAACAPwAAgD8AAAAAAACAPwAAgD8AAABAAACAPwAAAEAAAABAAACAwAAAgD8AAABAAACAwAAAgD8AAAAAAACAwAAAAEAAAAAAAACAwAAAAEAAAABAAIAAAP///78AgAAA////vwCAAAD///+/AIAAAP///78AgP//////vwCA//////+/AID//////78AgP//////v/////8AAP+//////wAA/7//////AAD/v/////8AAP+//3//f////7//f/9/////v/9//3////+//3//f////7///wCA////////AID///////8AgP///////wCA/////wAAAID/f/+/AAAAgP9//78AAACA/3//vwAAAID/f/+/")
+}]
+metadata/ub_uv2_texel = 0.2
+metadata/ub_uv2_scale = Vector3(1, 1, 1)
+metadata/ub_compile_hash = 3767505579
+
+[sub_resource type="Resource" id="Resource_a5a6d"]
+script = ExtResource("8_lf3p4")
+vertices = PackedInt32Array(0, 3, 2, 1)
+material_index = 1
+uv_coords = PackedVector2Array()
+color_corners = PackedColorArray()
+
+[sub_resource type="Resource" id="Resource_epivr"]
+script = ExtResource("8_lf3p4")
+vertices = PackedInt32Array(4, 5, 6, 7)
+material_index = 1
+uv_coords = PackedVector2Array()
+color_corners = PackedColorArray()
+
+[sub_resource type="Resource" id="Resource_fv851"]
+script = ExtResource("8_lf3p4")
+vertices = PackedInt32Array(0, 1, 5, 4)
+material_index = 1
+uv_coords = PackedVector2Array()
+color_corners = PackedColorArray()
+
+[sub_resource type="Resource" id="Resource_2h8uv"]
+script = ExtResource("8_lf3p4")
+vertices = PackedInt32Array(2, 3, 7, 6)
+material_index = 1
+uv_coords = PackedVector2Array()
+color_corners = PackedColorArray()
+
+[sub_resource type="Resource" id="Resource_2v1jd"]
+script = ExtResource("8_lf3p4")
+vertices = PackedInt32Array(1, 2, 6, 5)
+material_index = 1
+uv_coords = PackedVector2Array()
+color_corners = PackedColorArray()
+
+[sub_resource type="Resource" id="Resource_4hw6v"]
+script = ExtResource("8_lf3p4")
+vertices = PackedInt32Array(0, 4, 7, 3)
+material_index = 1
+uv_coords = PackedVector2Array()
+color_corners = PackedColorArray()
+
+[sub_resource type="Resource" id="Resource_teywe"]
+script = ExtResource("9_yydhl")
+positions = PackedVector3Array(-4, 1, 0, 1, 1, 0, 1, 1, 2, -4, 1, 2, -4, 2, 0, 1, 2, 0, 1, 2, 2, -4, 2, 2)
+faces = Array[ExtResource("8_lf3p4")]([SubResource("Resource_a5a6d"), SubResource("Resource_epivr"), SubResource("Resource_fv851"), SubResource("Resource_2h8uv"), SubResource("Resource_2v1jd"), SubResource("Resource_4hw6v")])
 material_slots = Array[Material]([null, ExtResource("7_lf3p4")])
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_omn1t"]
@@ -884,6 +956,8 @@ shape_spec = {
 
 [node name="Level1" type="Node3D" unique_id=346480120]
 
+[node name="GlobalSignals" type="GlobalSignalsImpl" parent="." unique_id=1641864431]
+
 [node name="PlayerSpawner" type="PlayerSpawner" parent="." unique_id=256587168]
 player_scene = ExtResource("1_b3oru")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 9, -1.5)
@@ -899,6 +973,14 @@ distance = 0.0
 
 [node name="OmniLight3D" type="DirectionalLight3D" parent="PlayerSpawner" unique_id=1413287948]
 transform = Transform3D(1, 0, 0, 0, 0.25881907, 0.9659258, 0, -0.9659258, 0.25881907, 0, 5, 0)
+
+[node name="hitbox" type="Area3D" parent="PlayerSpawner" unique_id=1226778913]
+collision_layer = 32768
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PlayerSpawner/hitbox" unique_id=1415581673]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+shape = SubResource("CylinderShape3D_prsbl")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=121822769]
 environment = SubResource("Environment_045es")
@@ -928,11 +1010,12 @@ process_mode = 4
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, -1.5)
 
 [node name="Path3D" type="Path3D" parent="allmovingplatforms" unique_id=746492340]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 9, -11)
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 7, 9, -11)
 curve = SubResource("Curve3D_pdpul")
 
 [node name="TweenController" type="TweenController" parent="allmovingplatforms/Path3D" unique_id=653602100]
-forward_speed = 5.0
+forward_speed = 2.0
+wait_one = 1.0
 start_activated = true
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 4, 0, 0)
 
@@ -949,10 +1032,11 @@ script = ExtResource("9_omn1t")
 metadata/_custom_type_script = "uid://ox8eicf01gw"
 
 [node name="Path3D2" type="Path3D" parent="allmovingplatforms" unique_id=577014156]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 9, -13)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 9, -13)
 curve = SubResource("Curve3D_pdpul")
 
 [node name="TweenController" type="TweenController" parent="allmovingplatforms/Path3D2" unique_id=1967722712]
+forward_speed = 2.0
 wait_one = 1.0
 start_activated = true
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 4, 0, 0)
@@ -969,11 +1053,11 @@ process_mode = 3
 script = ExtResource("9_omn1t")
 
 [node name="Path3D3" type="Path3D" parent="allmovingplatforms" unique_id=517261550]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 9, -15)
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 7, 9, -15)
 curve = SubResource("Curve3D_pdpul")
 
 [node name="TweenController" type="TweenController" parent="allmovingplatforms/Path3D3" unique_id=902348159]
-forward_speed = 4.0
+forward_speed = 2.0
 wait_one = 1.0
 wait_two = 0.5
 start_activated = true
@@ -991,11 +1075,12 @@ process_mode = 3
 script = ExtResource("9_omn1t")
 
 [node name="Path3D4" type="Path3D" parent="allmovingplatforms" unique_id=462580374]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 9, -17)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 9, -17)
 curve = SubResource("Curve3D_pdpul")
 
 [node name="TweenController" type="TweenController" parent="allmovingplatforms/Path3D4" unique_id=1237045554]
-forward_speed = 3.0
+forward_speed = 2.0
+wait_one = 1.0
 start_activated = true
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 4, 0, 0)
 
@@ -1027,6 +1112,16 @@ collision_mode = 1
 [node name="UBArea3DContainer" type="Node3D" parent="UBCube" unique_id=1860562738]
 script = ExtResource("9_omn1t")
 metadata/_custom_type_script = "uid://ox8eicf01gw"
+
+[node name="UBCube4" type="MeshInstance3D" parent="." unique_id=1101404695]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 7, -21)
+mesh = SubResource("ArrayMesh_ls4ot")
+script = ExtResource("7_omn1t")
+mesh_data = SubResource("Resource_teywe")
+collision_mode = 1
+
+[node name="UBArea3DContainer" type="Node3D" parent="UBCube4" unique_id=1359390387]
+script = ExtResource("9_omn1t")
 
 [node name="UBCube2" type="MeshInstance3D" parent="." unique_id=1146363130]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 7, -2)
@@ -1060,6 +1155,19 @@ collision_mode = 1
 [node name="UBArea3DContainer" type="Node3D" parent="UBCylinder" unique_id=500974434]
 script = ExtResource("9_omn1t")
 
+[node name="Spiketrap" parent="." unique_id=161872130 instance=ExtResource("9_lf3p4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 9, -20)
+trap_every = 3.0
+
+[node name="Spiketrap2" parent="." unique_id=672458498 instance=ExtResource("9_lf3p4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 9, -20)
+start_delay = 2.0
+trap_every = 3.0
+
+[node name="Checkpoint" parent="." unique_id=78602232 instance=ExtResource("11_yydhl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 9, -2)
+
+[connection signal="ready" from="PlayerSpawner" to="PlayerSpawner" method="spawn"]
 [connection signal="pressed" from="HeavyDutyButton" to="allmovingplatforms/Enabler" method="enable"]
 [connection signal="released" from="HeavyDutyButton" to="allmovingplatforms/Enabler" method="disable"]
 [connection signal="pressed" from="UBCube3/HeavyDutyButton10" to="bridge/PathFollow3D" method="activate"]

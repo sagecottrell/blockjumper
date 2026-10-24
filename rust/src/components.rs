@@ -198,8 +198,12 @@ impl INode3D for PlayerSpawner {
             player_scene: None,
         }
     }
+}
 
-    fn ready(&mut self) {
+#[godot_api]
+impl PlayerSpawner {
+    #[func]
+    fn spawn(&mut self) {
         if Engine::singleton().is_editor_hint() {
             return;
         }
@@ -218,10 +222,7 @@ impl INode3D for PlayerSpawner {
             }
         }
     }
-}
 
-#[godot_api]
-impl PlayerSpawner {
     #[func]
     fn set_player_scene(&mut self, scene: Option<Gd<PackedScene>>) {
         self.player_scene = scene.clone();

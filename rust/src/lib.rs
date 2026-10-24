@@ -32,17 +32,19 @@ impl INode3D for GLTFImport {
     }
 
     fn ready(&mut self) {
-        let anim_lib: Gd<AnimationPlayer> =
-            self.base().find_child("AnimationPlayer").unwrap().cast();
-        self.anim_lib = Some(anim_lib);
+        let anim_lib: Option<Gd<AnimationPlayer>> =
+            self.base().find_child("AnimationPlayer").map(|x| x.cast());
+        self.anim_lib = anim_lib;
     }
 }
 
 #[godot_api]
 impl GLTFImport {
+    #[func]
     pub fn play_animation(&mut self, anim_name: StringName) {
         self.play_animation_with_length(anim_name, 1.0);
     }
+    #[func]
     pub fn play_animation_with_length(&mut self, anim_name: StringName, length: f32) {
         if let Some(anim) = self.anim_lib.clone() {
             let s = anim.get_animation_library("").unwrap();
@@ -50,6 +52,7 @@ impl GLTFImport {
             self.play_animation_with_scale(anim_name, scale / length);
         }
     }
+    #[func]
     pub fn play_animation_with_scale(&mut self, anim_name: StringName, scale: f32) {
         if let Some(mut anim) = self.anim_lib.clone() {
             anim.seek(0.);

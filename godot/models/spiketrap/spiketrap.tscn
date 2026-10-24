@@ -1,0 +1,120 @@
+[gd_scene format=3 uid="uid://dt0r2ym10casc"]
+
+[ext_resource type="PackedScene" uid="uid://dsr4lhpojxf84" path="res://models/spiketrap/spiketrap.gltf" id="1_85myt"]
+
+[sub_resource type="GDScript" id="GDScript_5j4jy"]
+resource_name = "spiketrap"
+script/source = "@tool
+extends Node3D
+
+signal on_hit
+
+@export_range(0, 10) var start_delay: float = 0:
+	set(value):
+		var s := start_delay
+		start_delay = value
+		if !is_inside_tree():
+			return
+		if value < s:
+			_start_delay(trap_every - s + value)
+		elif value > s:
+			_start_delay(value - s)
+	
+@export_range(3, 20) var trap_every: float = 3:
+	set(value):
+		if is_inside_tree():
+			var mintime := tele_2_act.wait_time + act_2_deac.wait_time + 2
+			trap_every = max(value, mintime)
+			deac_2_tele.wait_time = trap_every - mintime
+		else:
+			trap_every = value
+		
+@onready var tele_2_act: Timer = $tele2act
+@onready var act_2_deac: Timer = $act2deac
+@onready var deac_2_tele: Timer = $deac2tele
+@onready var blockbench_export: GLTFImport = $blockbench_export
+@onready var area_3d: Area3D = $Area3D
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	tele_2_act.timeout.connect(_act)
+	act_2_deac.timeout.connect(_deac)
+	deac_2_tele.timeout.connect(_tele)
+	area_3d.area_entered.connect(_hit)
+	
+	deac_2_tele.wait_time = trap_every
+	deac_2_tele.start()
+
+func _start_delay(delay: float):
+	pause()
+	await get_tree().create_timer(delay).timeout
+	start()
+
+func _hit(_area: Area3D):
+	on_hit.emit()
+
+func _act():
+	area_3d.process_mode = Node.PROCESS_MODE_INHERIT
+	act_2_deac.start()
+	blockbench_export.play_animation_with_length(\"activate\", 0.1)
+
+func _deac():
+	area_3d.process_mode = Node.PROCESS_MODE_DISABLED
+	deac_2_tele.start()
+	blockbench_export.play_animation(\"deactivate\")
+	
+func _tele():
+	tele_2_act.start()
+	blockbench_export.play_animation_with_length(\"telegraph\", 0.1)
+
+func pause():
+	tele_2_act.paused = true
+	act_2_deac.paused = true
+	deac_2_tele.paused = true
+
+func start():
+	tele_2_act.paused = false
+	act_2_deac.paused = false
+	deac_2_tele.paused = false
+"
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_prsbl"]
+height = 0.5
+
+[node name="Spiketrap" type="Node3D" unique_id=161872130]
+script = SubResource("GDScript_5j4jy")
+trap_every = 7.0
+
+[node name="blockbench_export" parent="." unique_id=926860898 instance=ExtResource("1_85myt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, 0.5)
+
+[node name="spikes" parent="blockbench_export/root" parent_id_path=PackedInt32Array(926860898, 904650946) index="1" unique_id=689534361]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.4375, 0)
+
+[node name="AnimationPlayer" parent="blockbench_export" index="1" unique_id=2124866246]
+speed_scale = 0.25
+
+[node name="tele2act" type="Timer" parent="." unique_id=814061202]
+wait_time = 3.0
+one_shot = true
+
+[node name="act2deac" type="Timer" parent="." unique_id=616589931]
+wait_time = 2.0
+one_shot = true
+
+[node name="deac2tele" type="Timer" parent="." unique_id=334232802]
+wait_time = 7.0
+one_shot = true
+
+[node name="Area3D" type="Area3D" parent="." unique_id=880100284]
+process_mode = 4
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.3, 0.5)
+collision_layer = 0
+collision_mask = 32768
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D" unique_id=1101055947]
+shape = SubResource("CylinderShape3D_prsbl")
+debug_color = Color(0.99607843, 0, 0.18431373, 1)
+
+[editable path="blockbench_export"]

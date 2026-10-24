@@ -25,4 +25,15 @@ impl GlobalSignalsImpl {
 
     #[signal]
     fn player_died();
+
+    #[signal]
+    fn checkpoint_get(node: Gd<Node3D>);
+
+    #[func]
+    fn on_checkpoint_get(&mut self, node: Gd<Node3D>) {
+        self.signals().checkpoint_get().emit(&node);
+    }
+
+    #[signal]
+    fn player_hit(amount: u8);
 }
