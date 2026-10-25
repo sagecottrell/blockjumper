@@ -1,8 +1,9 @@
+use crate::DamageSource;
 use godot::prelude::*;
 
 #[derive(GodotClass)]
 #[class(base=Node, tool)]
-struct GlobalSignalsImpl {
+pub struct GlobalSignalsImpl {
     base: Base<Node>,
 }
 
@@ -16,24 +17,34 @@ impl INode for GlobalSignalsImpl {
 #[godot_api]
 impl GlobalSignalsImpl {
     #[signal]
-    fn collection_completed();
+    pub fn collection_completed();
 
     #[func]
-    fn on_collection_completed(&mut self) {
+    pub fn on_collection_completed(&mut self) {
         self.signals().collection_completed().emit();
     }
 
     #[signal]
-    fn player_died();
-
-    #[signal]
-    fn checkpoint_get(node: Gd<Node3D>);
+    pub fn object_died(obj: Gd<Node3D>, dmg: Option<Gd<DamageSource>>);
 
     #[func]
-    fn on_checkpoint_get(&mut self, node: Gd<Node3D>) {
+    pub fn on_object_died(&mut self, obj: Gd<Node3D>, dmg: Option<Gd<DamageSource>>) {
+        self.signals().object_died().emit(&obj, dmg.as_ref());
+    }
+
+    #[signal]
+    pub fn checkpoint_get(node: Gd<Node3D>);
+
+    #[func]
+    pub fn on_checkpoint_get(&mut self, node: Gd<Node3D>) {
         self.signals().checkpoint_get().emit(&node);
     }
 
     #[signal]
-    fn player_hit(amount: u8);
+    pub fn object_hit(obj: Gd<Node3D>, amount: Gd<DamageSource>);
+
+    #[func]
+    pub fn on_object_hit(&mut self, obj: Gd<Node3D>, amount: Gd<DamageSource>) {
+        self.signals().object_hit().emit(&obj, &amount);
+    }
 }

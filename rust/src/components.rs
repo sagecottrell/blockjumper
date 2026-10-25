@@ -1,7 +1,7 @@
 use godot::{
     classes::{
-        Engine, IPathFollow3D, MeshInstance3D, Path3D, PathFollow3D, QuadMesh, StandardMaterial3D,
-        Texture2D, Tween,
+        Area3D, Engine, IPathFollow3D, MeshInstance3D, Path3D, PathFollow3D, QuadMesh,
+        StandardMaterial3D, Texture2D, Tween,
         base_material_3d::{BillboardMode, ShadingMode, TextureFilter, TextureParam, Transparency},
         node::ProcessMode,
         notify::Node3DNotification,
@@ -9,7 +9,7 @@ use godot::{
     prelude::*,
 };
 
-use crate::{GLTFImport, player::Player};
+use crate::{DamageSource, GLTFImport, global_signals::GlobalSignalsImpl, player::Player};
 
 #[derive(GodotClass)]
 #[class(base=Node3D, internal, tool)]
@@ -187,6 +187,9 @@ struct PlayerSpawner {
     #[export]
     #[var(set=set_player_scene)]
     player_scene: Option<Gd<PackedScene>>,
+    #[export]
+    global_signals: Option<Gd<GlobalSignalsImpl>>,
+    player: Option<Gd<Player>>,
     base: Base<Node3D>,
 }
 
@@ -196,6 +199,18 @@ impl INode3D for PlayerSpawner {
         Self {
             base,
             player_scene: None,
+            global_signals: None,
+            player: None,
+        }
+    }
+
+    fn ready(&mut self) {
+        if !Engine::singleton().is_editor_hint() {
+            for mut child in self.base_mut().get_children().iter_shared() {
+                if child.get_process_mode() == ProcessMode::INHERIT {
+                    child.set_process_mode(ProcessMode::DISABLED);
+                }
+            }
         }
     }
 }
@@ -208,6 +223,11 @@ impl PlayerSpawner {
             return;
         }
 
+        if let Some(mut existing) = self.player.clone() {
+            existing.queue_free();
+            self.player = None;
+        }
+
         if let Some(scene) = self.player_scene.clone() {
             let mut instance: Gd<Player> = scene.instantiate_as();
             self.base()
@@ -215,11 +235,12 @@ impl PlayerSpawner {
                 .unwrap()
                 .call_deferred("add_child", &[instance.clone().to_variant()]);
             instance.set_transform(self.base().get_transform());
-            for mut child in self.base_mut().get_children().iter_shared() {
-                let dup = child.duplicate_node();
-                child.set_process_mode(ProcessMode::DISABLED);
+            for child in self.base_mut().get_children().iter_shared() {
+                let mut dup = child.duplicate_node();
+                dup.set_process_mode(ProcessMode::INHERIT);
                 instance.call_deferred("add_child", &[dup.to_variant()]);
             }
+            self.player = Some(instance);
         }
     }
 
@@ -239,6 +260,8 @@ impl PlayerSpawner {
 }
 
 //
+// =====================================================================================
+// // =====================================================================================
 #[derive(GodotClass)]
 #[class(tool, base=PathFollow3D)]
 struct TweenController {
@@ -467,5 +490,51 @@ impl Enabler {
             .unwrap()
             .set_process_mode(ProcessMode::DISABLED);
         self.signals().disabled().emit();
+    }
+}
+
+#[derive(GodotClass)]
+#[class(base=Area3D, init)]
+pub struct Hitbox {
+    #[export]
+    trigger_checkpoint: bool,
+    base: Base<Area3D>,
+}
+
+#[godot_api]
+impl Hitbox {
+    #[signal]
+    pub fn hit(dmg: Option<Gd<DamageSource>>);
+
+    #[func]
+    pub fn on_hit(&mut self, dmg: Option<Gd<DamageSource>>) {
+        self.signals().hit().emit(dmg.as_ref());
+    }
+
+    #[signal]
+    pub fn checkpoint(cp: Gd<Node3D>);
+    #[func]
+    pub fn on_checkpoint(&mut self, cp: Gd<Node3D>) {
+        if !self.trigger_checkpoint {
+            return;
+        }
+        self.signals().checkpoint().emit(&cp);
+    }
+}
+
+#[derive(GodotClass)]
+#[class(base=Node3D, init)]
+pub struct Teleport {
+    base: Base<Node3D>,
+}
+
+#[godot_api]
+impl Teleport {
+    #[func]
+    pub fn teleport_parent_to(&mut self, to: Gd<Node3D>) {
+        if let Some(mut parent) = self.base().get_parent_node_3d() {
+            parent.set_global_transform(to.get_global_transform());
+            godot_print!("teleported node {} to {}", parent, to);
+        }
     }
 }

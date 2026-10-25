@@ -185,3 +185,12 @@ impl ActivationRange {
 
 // ===================================================================================================
 // ===================================================================================================
+
+#[derive(GodotClass)]
+#[class(base=Resource, tool, init)]
+pub struct DamageSource {
+    #[export]
+    amount: u8,
+
+    base: Base<Resource>,
+}

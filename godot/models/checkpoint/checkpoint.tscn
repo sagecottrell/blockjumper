@@ -2,17 +2,37 @@
 
 [ext_resource type="PackedScene" uid="uid://cyfydgncbfdml" path="res://models/checkpoint/checkpoint.gltf" id="1_xmt1c"]
 
+[sub_resource type="GDScript" id="GDScript_xmt1c"]
+resource_name = "checkpoint"
+script/source = "extends Node3D
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	$Area3D.area_entered.connect(_hit)
+
+func _hit(area: Area3D):
+	if area is Hitbox:
+		area.on_checkpoint($Marker3D)
+"
+
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_xmt1c"]
 height = 0.5
 
 [node name="Checkpoint" type="Node3D" unique_id=78602232]
+script = SubResource("GDScript_xmt1c")
 
 [node name="blockbench_export" parent="." unique_id=1881398663 instance=ExtResource("1_xmt1c")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, 0.5)
 
 [node name="Area3D" type="Area3D" parent="." unique_id=308511541]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.3, 0.5)
+collision_layer = 0
+collision_mask = 2
+monitorable = false
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D" unique_id=621731630]
 shape = SubResource("CylinderShape3D_xmt1c")
 debug_color = Color(0.99607843, 0, 0.18431373, 1)
+
+[node name="Marker3D" type="Marker3D" parent="." unique_id=933677072]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, 0.5)
