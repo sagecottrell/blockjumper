@@ -446,22 +446,18 @@ impl TweenController {
 }
 
 #[derive(GodotClass)]
-#[class(tool, base=Node)]
+#[class(tool, base=Node, init)]
 struct Enabler {
     #[export]
+    #[init(val = true)]
     start_enabled: bool,
+    #[export]
+    hide_disabled: bool,
     base: Base<Node>,
 }
 
 #[godot_api]
 impl INode for Enabler {
-    fn init(base: Base<Node>) -> Self {
-        Self {
-            base,
-            start_enabled: true,
-        }
-    }
-
     fn ready(&mut self) {
         if self.start_enabled {
             self.enable();
@@ -481,19 +477,25 @@ impl Enabler {
 
     #[func]
     fn enable(&mut self) {
-        self.base()
-            .get_parent()
-            .unwrap()
-            .set_process_mode(ProcessMode::INHERIT);
+        let mut parent = self.base().get_parent().unwrap();
+        parent.set_process_mode(ProcessMode::INHERIT);
+        if self.hide_disabled
+            && let Ok(mut n3d) = parent.try_cast::<Node3D>()
+        {
+            n3d.set_visible(true);
+        }
         self.signals().enabled().emit();
     }
 
     #[func]
     fn disable(&mut self) {
-        self.base()
-            .get_parent()
-            .unwrap()
-            .set_process_mode(ProcessMode::DISABLED);
+        let mut parent = self.base().get_parent().unwrap();
+        parent.set_process_mode(ProcessMode::DISABLED);
+        if self.hide_disabled
+            && let Ok(mut n3d) = parent.try_cast::<Node3D>()
+        {
+            n3d.set_visible(false);
+        }
         self.signals().disabled().emit();
     }
 }
@@ -588,5 +590,95 @@ impl EnemyHurtbox {
         if let Ok(mut hitbox) = area.try_cast::<Hitbox>() {
             hitbox.bind_mut().on_hit(self.damage.clone());
         }
+    }
+}
+
+// ===================================================================================================
+// ===================================================================================================
+
+#[derive(GodotClass)]
+#[class(base=Node, init)]
+pub struct CollectiblesGroup {
+    items: Vec<Gd<CollectibleHitbox>>,
+    total_collected: u8,
+    base: Base<Node>,
+}
+
+#[godot_api]
+impl CollectiblesGroup {
+    #[signal]
+    pub fn partial_collected(remaining: u8);
+    #[signal]
+    pub fn all_collected();
+
+    #[func]
+    pub fn add_item(&mut self, item: Gd<CollectibleHitbox>) {
+        self.items.push(item);
+    }
+    #[func]
+    pub fn try_remove_item(&mut self, item: Gd<CollectibleHitbox>) -> bool {
+        match self.items.iter().position(|f| f == &item) {
+            Some(pos) => {
+                self.items.swap_remove(pos);
+                true
+            }
+            _ => false,
+        }
+    }
+
+    #[func]
+    pub fn item_complete(&mut self, item: Gd<CollectibleHitbox>) {
+        if self.try_remove_item(item) {
+            godot_print!("collected item and recorded");
+            self.total_collected += 1;
+            let len = self.items.len() as u8;
+
+            if self.items.is_empty() {
+                self.signals().all_collected().emit();
+            } else {
+                self.signals().partial_collected().emit(len);
+            }
+        }
+    }
+}
+
+#[derive(GodotClass)]
+#[class(base=Area3D, init)]
+pub struct CollectibleHitbox {
+    base: Base<Area3D>,
+}
+
+#[godot_api]
+impl godot::classes::IArea3D for CollectibleHitbox {
+    fn enter_tree(&mut self) {
+        let s = self.to_gd();
+        self.base_mut()
+            .signals()
+            .area_entered()
+            .connect_other(&s.clone(), Self::on_area_enter);
+        self.signals().ready_wself().emit(&s);
+    }
+}
+
+#[godot_api]
+impl CollectibleHitbox {
+    #[signal]
+    fn collected();
+    #[signal]
+    fn collected_wself(item: Gd<CollectibleHitbox>);
+
+    #[signal]
+    fn ready_wself(item: Gd<CollectibleHitbox>);
+
+    #[func]
+    fn on_area_enter(&mut self, _area: Gd<Area3D>) {
+        self.base_mut().call_deferred("emit", &[]);
+    }
+
+    #[func]
+    fn emit(&mut self) {
+        self.signals().collected().emit();
+        let s = self.to_gd();
+        self.signals().collected_wself().emit(&s);
     }
 }

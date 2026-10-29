@@ -17,14 +17,6 @@ impl INode for GlobalSignalsImpl {
 #[godot_api]
 impl GlobalSignalsImpl {
     #[signal]
-    pub fn collection_completed();
-
-    #[func]
-    pub fn on_collection_completed(&mut self) {
-        self.signals().collection_completed().emit();
-    }
-
-    #[signal]
     pub fn object_died(obj: Gd<Node3D>, dmg: Option<Gd<DamageSource>>);
 
     #[func]

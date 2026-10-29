@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://1j54g5vcwtds"]
+
+[ext_resource type="PackedScene" uid="uid://btutdcdaols87" path="res://models/bluecone/redcoin.gltf" id="1_hwi87"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_5j4jy"]
+height = 1.0
+radius = 0.3
+
+[node name="Bluecone" type="CollectibleHitbox" unique_id=1403835074]
+collision_layer = 0
+collision_mask = 32768
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=355222064]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0.5, 0.5)
+shape = SubResource("CylinderShape3D_5j4jy")
+debug_color = Color(0, 1, 0, 0.41960785)
+
+[node name="blockbench_export" parent="." unique_id=68964857 instance=ExtResource("1_hwi87")]
+transform = Transform3D(0.53, 0, 0, 0, 0.53, 0, 0, 0, 0.53, -0.5, 0.5, 0.5)
+
+[node name="root" parent="blockbench_export" index="0" unique_id=1181003623]
+transform = Transform3D(0.87164515, -0.18756738, -0.4528277, -7.4505797e-09, 0.92387944, -0.38268346, 0.49013713, 0.3335642, 0.8052952, 3.416071e-17, 1.3877788e-17, 0)
+
+[node name="cone2" parent="blockbench_export/root" index="0" unique_id=833476373]
+transform = Transform3D(0.519531, 0, -0.8544515, 0, 1, 0, 0.8544515, 0, 0.519531, 0, -0.5, 0)
+
+[node name="Enabler" type="Enabler" parent="." unique_id=1029140227]
+hide_disabled = true
+
+[connection signal="collected" from="." to="Enabler" method="disable"]
+[connection signal="ready" from="." to="blockbench_export" method="play_animation" binds= [&"spin"]]
+
+[editable path="blockbench_export"]

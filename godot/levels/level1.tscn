@@ -13,6 +13,7 @@
 [ext_resource type="Script" uid="uid://ox8eicf01gw" path="res://UBArea3DContainer.gd" id="9_omn1t"]
 [ext_resource type="Script" uid="uid://dnaqomcyqdloo" path="res://addons/unibuilder/core/ub_mesh_data.gd" id="9_yydhl"]
 [ext_resource type="PackedScene" uid="uid://dgsbiw80q0aiv" path="res://models/checkpoint/checkpoint.tscn" id="11_yydhl"]
+[ext_resource type="PackedScene" uid="uid://1j54g5vcwtds" path="res://models/bluecone/bluecone.tscn" id="14_f7u7y"]
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_prsbl"]
 height = 1.0
@@ -975,6 +976,8 @@ metadata/_custom_type_script = "uid://bd046eokvcnu2"
 
 [node name="GlobalSignals" type="GlobalSignalsImpl" parent="." unique_id=1641864431]
 
+[node name="CollectiblesGroup" type="CollectiblesGroup" parent="GlobalSignals" unique_id=434235092]
+
 [node name="spawnercontainer" type="Node3D" parent="." unique_id=799412018]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 9, -1.5)
 
@@ -1159,7 +1162,7 @@ collision_mode = 1
 script = ExtResource("9_omn1t")
 
 [node name="UBCube3" type="MeshInstance3D" parent="." unique_id=1086340926]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9, -1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 9, -1)
 mesh = SubResource("ArrayMesh_lf3p4")
 script = ExtResource("7_omn1t")
 mesh_data = SubResource("Resource_4mjh6")
@@ -1197,7 +1200,14 @@ trap_every = 3.0
 [node name="Checkpoint" parent="." unique_id=78602232 instance=ExtResource("11_yydhl")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 9, -2)
 
+[node name="Bluecone" parent="." unique_id=1403835074 instance=ExtResource("14_f7u7y")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 9, -4)
+
+[node name="Bluecone2" parent="." unique_id=91097844 instance=ExtResource("14_f7u7y")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 9, -4)
+
 [connection signal="checkpoint_get" from="GlobalSignals" to="spawnercontainer/Teleport" method="teleport_parent_to"]
+[connection signal="all_collected" from="GlobalSignals/CollectiblesGroup" to="bridge/PathFollow3D" method="activate"]
 [connection signal="ready" from="spawnercontainer/PlayerSpawner" to="spawnercontainer/PlayerSpawner" method="spawn"]
 [connection signal="checkpoint" from="spawnercontainer/PlayerSpawner/hitbox" to="GlobalSignals" method="on_checkpoint_get"]
 [connection signal="hit" from="spawnercontainer/PlayerSpawner/hitbox" to="spawnercontainer/PlayerSpawner" method="spawn" unbinds=1]
@@ -1206,3 +1216,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 9, -2)
 [connection signal="released" from="HeavyDutyButton" to="allmovingplatforms/Enabler" method="disable"]
 [connection signal="pressed" from="UBCube3/HeavyDutyButton10" to="bridge/PathFollow3D" method="activate"]
 [connection signal="released" from="UBCube3/HeavyDutyButton10" to="bridge/PathFollow3D" method="deactivate"]
+[connection signal="collected_wself" from="Bluecone" to="GlobalSignals/CollectiblesGroup" method="item_complete"]
+[connection signal="ready_wself" from="Bluecone" to="GlobalSignals/CollectiblesGroup" method="add_item"]
+[connection signal="collected_wself" from="Bluecone2" to="GlobalSignals/CollectiblesGroup" method="item_complete"]
+[connection signal="ready_wself" from="Bluecone2" to="GlobalSignals/CollectiblesGroup" method="add_item"]
