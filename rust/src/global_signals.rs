@@ -1,4 +1,4 @@
-use crate::DamageSource;
+use crate::{DamageSource, GLTFImport};
 use godot::prelude::*;
 
 #[derive(GodotClass)]
@@ -46,5 +46,22 @@ impl GlobalSignalsImpl {
     #[func]
     pub fn on_object_hit(&mut self, obj: Gd<Node3D>, amount: Gd<DamageSource>) {
         self.signals().object_hit().emit(&obj, &amount);
+    }
+
+    #[func]
+    pub fn activate_obj_and_gltf(&mut self, obj: Gd<Node3D>) {
+        self.activate_obj_and_gltf_anim(obj, "activate".into());
+    }
+
+    #[func]
+    pub fn activate_obj_and_gltf_anim(&mut self, mut obj: Gd<Node3D>, anim: StringName) {
+        if obj.has_method("activate") {
+            obj.call("activate", &[]);
+        }
+        if let Some(child) = obj.find_child_ex("blockbench_export").done() {
+            if let Ok(mut g) = child.try_cast::<GLTFImport>() {
+                g.bind_mut().play_animation(anim);
+            }
+        }
     }
 }

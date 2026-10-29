@@ -189,6 +189,10 @@ struct PlayerSpawner {
     player_scene: Option<Gd<PackedScene>>,
     #[export]
     global_signals: Option<Gd<GlobalSignalsImpl>>,
+
+    /// the target node that should contain the spawned player
+    #[export]
+    container: Option<Gd<Node3D>>,
     player: Option<Gd<Player>>,
     base: Base<Node3D>,
 }
@@ -201,6 +205,7 @@ impl INode3D for PlayerSpawner {
             player_scene: None,
             global_signals: None,
             player: None,
+            container: None,
         }
     }
 
@@ -230,11 +235,11 @@ impl PlayerSpawner {
 
         if let Some(scene) = self.player_scene.clone() {
             let mut instance: Gd<Player> = scene.instantiate_as();
-            self.base()
-                .get_parent_node_3d()
-                .unwrap()
+            self.container
+                .clone()
+                .unwrap_or_else(|| self.base().get_parent_node_3d().unwrap())
                 .call_deferred("add_child", &[instance.clone().to_variant()]);
-            instance.set_transform(self.base().get_transform());
+            instance.set_global_transform(self.base().get_global_transform());
             for child in self.base_mut().get_children().iter_shared() {
                 let mut dup = child.duplicate_node();
                 dup.set_process_mode(ProcessMode::INHERIT);
@@ -513,6 +518,8 @@ impl Hitbox {
 
     #[signal]
     pub fn checkpoint(cp: Gd<Node3D>);
+
+    /// emits the checkpoint signal if `trigger_checkpoint` is true
     #[func]
     pub fn on_checkpoint(&mut self, cp: Gd<Node3D>) {
         if !self.trigger_checkpoint {
@@ -523,18 +530,17 @@ impl Hitbox {
 }
 
 #[derive(GodotClass)]
-#[class(base=Node3D, init)]
+#[class(base=Node, init)]
 pub struct Teleport {
-    base: Base<Node3D>,
+    base: Base<Node>,
 }
 
 #[godot_api]
 impl Teleport {
     #[func]
     pub fn teleport_parent_to(&mut self, to: Gd<Node3D>) {
-        if let Some(mut parent) = self.base().get_parent_node_3d() {
+        if let Ok(mut parent) = self.base().get_parent().unwrap().try_cast::<Node3D>() {
             parent.set_global_transform(to.get_global_transform());
-            godot_print!("teleported node {} to {}", parent, to);
         }
     }
 }

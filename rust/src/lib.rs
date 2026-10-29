@@ -42,7 +42,7 @@ impl INode3D for GLTFImport {
 impl GLTFImport {
     #[func]
     pub fn play_animation(&mut self, anim_name: StringName) {
-        self.play_animation_with_length(anim_name, 1.0);
+        self.play_animation_with_scale(anim_name, 1.0);
     }
     #[func]
     pub fn play_animation_with_length(&mut self, anim_name: StringName, length: f32) {
@@ -60,6 +60,11 @@ impl GLTFImport {
             anim.set_current_animation(&anim_name);
             anim.play();
         }
+    }
+
+    #[func]
+    pub fn play_activate(&mut self) {
+        self.play_animation("activate".into());
     }
 }
 
