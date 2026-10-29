@@ -1,6 +1,12 @@
+use std::collections::HashMap;
+
 use godot::{
-    classes::{AnimationPlayer, Area3D, IArea3D, Mesh, ResourceLoader, node::ProcessMode},
+    classes::{
+        AnimationPlayer, Area3D, IArea3D, Material, Mesh, ResourceLoader, ShaderMaterial,
+        StandardMaterial3D, base_material_3d::TextureParam, node::ProcessMode,
+    },
     prelude::*,
+    signal::ConnectHandle,
 };
 
 mod components;
@@ -14,23 +20,53 @@ unsafe impl ExtensionLibrary for MyExtension {}
 
 // ===================================================================================================
 // ===================================================================================================
+//
 
 #[derive(GodotClass)]
-#[class(base=Node3D, tool)]
+#[class(base=Resource, init, tool)]
+struct ColorReplace {
+    #[export]
+    #[var(set=set_input)]
+    input: Color,
+    #[export]
+    #[var(set=set_output)]
+    output: Color,
+    base: Base<Resource>,
+}
+
+#[godot_api]
+impl ColorReplace {
+    #[signal]
+    fn on_input();
+    #[func]
+    fn set_input(&mut self, c: Color) {
+        self.input = c;
+        self.signals().on_input().emit();
+    }
+
+    #[signal]
+    fn on_output();
+    #[func]
+    fn set_output(&mut self, c: Color) {
+        self.output = c;
+        self.signals().on_output().emit();
+    }
+}
+
+#[derive(GodotClass)]
+#[class(base=Node3D, tool, init)]
 struct GLTFImport {
     base: Base<Node3D>,
     anim_lib: Option<Gd<AnimationPlayer>>,
+
+    #[export]
+    #[var(set=set_colors)]
+    color_replace: Array<Option<Gd<ColorReplace>>>,
+    color_replace_signals: Vec<ConnectHandle>,
 }
 
 #[godot_api]
 impl INode3D for GLTFImport {
-    fn init(base: Base<Node3D>) -> Self {
-        Self {
-            base,
-            anim_lib: None,
-        }
-    }
-
     fn ready(&mut self) {
         let anim_lib: Option<Gd<AnimationPlayer>> =
             self.base().find_child("AnimationPlayer").map(|x| x.cast());
@@ -66,6 +102,79 @@ impl GLTFImport {
     pub fn play_activate(&mut self) {
         self.play_animation("activate".into());
     }
+
+    #[func]
+    pub fn set_colors(&mut self, c: Array<Option<Gd<ColorReplace>>>) {
+        let s = self.to_gd();
+        let signals = &mut self.color_replace_signals;
+        for handle in signals.drain(..) {
+            handle.disconnect();
+        }
+        for c in c.iter_shared() {
+            if let Some(c) = c {
+                signals.push(
+                    c.signals()
+                        .on_input()
+                        .connect_other(&s, Self::update_overrides),
+                );
+                signals.push(
+                    c.signals()
+                        .on_output()
+                        .connect_other(&s, Self::update_overrides),
+                )
+            }
+        }
+        self.color_replace = c;
+        self.update_overrides();
+    }
+
+    fn update_overrides(&mut self) {
+        let children = self
+            .base()
+            .find_children_ex("")
+            .type_("MeshInstance3D")
+            .done();
+        let mut mat_map: HashMap<Gd<Material>, Gd<Material>> = HashMap::new();
+        for child in children.iter_shared() {
+            if let Ok(mut mesh) = child.try_cast::<godot::classes::MeshInstance3D>() {
+                let existing_material = mesh.get_mesh().unwrap().surface_get_material(0);
+                if let Some(m) = existing_material {
+                    let material = match mat_map.get(&m) {
+                        Some(mm) => mm.clone(),
+                        None => {
+                            let new_material = self
+                                .create_material(m.clone())
+                                .expect("must have gltf material");
+                            mat_map.insert(m, new_material.clone());
+                            new_material
+                        }
+                    };
+
+                    mesh.set_material_override(Some(material).as_ref());
+                }
+            }
+        }
+    }
+
+    fn create_material(&self, m: Gd<Material>) -> Option<Gd<Material>> {
+        let mut new_material = m;
+        let albedo = new_material
+            .clone()
+            .try_cast::<StandardMaterial3D>()
+            .ok()?
+            .get_texture(TextureParam::ALBEDO)?
+            .to_variant();
+        for c in self.color_replace.iter_shared() {
+            if let Some(c) = c {
+                let mut shader = color_replace_shader()?.duplicate_resource();
+                shader.set_shader_parameter("albedo_texture", &albedo);
+                shader.set_shader_parameter("input_color1", &c.bind().input.to_variant());
+                shader.set_shader_parameter("output_color1", &c.bind().output.to_variant());
+                new_material = shader.upcast::<Material>();
+            }
+        }
+        Some(new_material)
+    }
 }
 
 // ===================================================================================================
@@ -98,6 +207,10 @@ impl Platform {
 
 pub fn cube_side_mesh() -> Option<Gd<Mesh>> {
     try_load("uid://b1msou15xpkdq")
+}
+
+pub fn color_replace_shader() -> Option<Gd<ShaderMaterial>> {
+    try_load("uid://lyypliprgc46")
 }
 
 pub fn try_load<T: GodotClass>(uid: &str) -> Option<Gd<T>>

@@ -77,6 +77,7 @@ func start():
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_prsbl"]
 height = 0.5
+radius = 0.3
 
 [node name="Spiketrap" type="Node3D" unique_id=161872130]
 script = SubResource("GDScript_5j4jy")
