@@ -532,6 +532,9 @@ impl Hitbox {
 #[derive(GodotClass)]
 #[class(base=Node, init)]
 pub struct Teleport {
+    #[export(range=(0., 1.))]
+    #[init(val = 0.01)]
+    noop_if_close: f32,
     base: Base<Node>,
 }
 
@@ -540,7 +543,50 @@ impl Teleport {
     #[func]
     pub fn teleport_parent_to(&mut self, to: Gd<Node3D>) {
         if let Ok(mut parent) = self.base().get_parent().unwrap().try_cast::<Node3D>() {
+            if parent
+                .get_global_position()
+                .distance_to(to.get_global_position())
+                < self.noop_if_close
+            {
+                return;
+            }
             parent.set_global_transform(to.get_global_transform());
+            self.signals().teleported().emit(&to);
+        }
+    }
+
+    #[signal]
+    pub fn teleported(to: Gd<Node3D>);
+}
+
+// ===================================================================================================
+// ===================================================================================================
+
+#[derive(GodotClass)]
+#[class(base=Area3D, init)]
+pub struct EnemyHurtbox {
+    #[export]
+    damage: Option<Gd<DamageSource>>,
+    base: Base<Area3D>,
+}
+
+#[godot_api]
+impl godot::classes::IArea3D for EnemyHurtbox {
+    fn ready(&mut self) {
+        let s = self.to_gd();
+        self.base_mut()
+            .signals()
+            .area_entered()
+            .connect_other(&s.clone(), Self::on_area_enter);
+    }
+}
+
+#[godot_api]
+impl EnemyHurtbox {
+    #[func]
+    pub fn on_area_enter(&mut self, area: Gd<Area3D>) {
+        if let Ok(mut hitbox) = area.try_cast::<Hitbox>() {
+            hitbox.bind_mut().on_hit(self.damage.clone());
         }
     }
 }

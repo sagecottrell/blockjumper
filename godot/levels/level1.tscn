@@ -1198,10 +1198,10 @@ trap_every = 3.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 9, -2)
 
 [connection signal="checkpoint_get" from="GlobalSignals" to="spawnercontainer/Teleport" method="teleport_parent_to"]
-[connection signal="checkpoint_get" from="GlobalSignals" to="spawnercontainer/flag" method="play_animation" unbinds=1 binds= [&"activate"]]
 [connection signal="ready" from="spawnercontainer/PlayerSpawner" to="spawnercontainer/PlayerSpawner" method="spawn"]
 [connection signal="checkpoint" from="spawnercontainer/PlayerSpawner/hitbox" to="GlobalSignals" method="on_checkpoint_get"]
 [connection signal="hit" from="spawnercontainer/PlayerSpawner/hitbox" to="spawnercontainer/PlayerSpawner" method="spawn" unbinds=1]
+[connection signal="teleported" from="spawnercontainer/Teleport" to="spawnercontainer/flag" method="play_activate" unbinds=1]
 [connection signal="pressed" from="HeavyDutyButton" to="allmovingplatforms/Enabler" method="enable"]
 [connection signal="released" from="HeavyDutyButton" to="allmovingplatforms/Enabler" method="disable"]
 [connection signal="pressed" from="UBCube3/HeavyDutyButton10" to="bridge/PathFollow3D" method="activate"]

@@ -195,6 +195,7 @@ impl ActivationRange {
 #[class(base=Resource, tool, init)]
 pub struct DamageSource {
     #[export]
+    #[init(val = 1)]
     amount: u8,
 
     base: Base<Resource>,
