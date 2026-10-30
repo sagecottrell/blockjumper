@@ -7,14 +7,14 @@ use godot::{
         base_material_3d::{BillboardMode, ShadingMode, TextureFilter, TextureParam, Transparency},
         node::ProcessMode,
         notify::{Node3DNotification, NodeNotification},
+        tween,
     },
     prelude::*,
     signal::ConnectHandle,
 };
 
 use crate::{
-    ColorReplace, DamageSource, GLTFImport, color_replace_shader,
-    global_signals::GlobalSignalsImpl, player::Player,
+    ColorReplace, DamageSource, GLTFImport, color_replace_shader, global_signals::GlobalSignalsImpl,
 };
 
 #[derive(GodotClass)]
@@ -188,38 +188,28 @@ impl HeavyDutyButton {
 // // =====================================================================================
 
 #[derive(GodotClass)]
-#[class(tool, base=Node3D)]
+#[class(tool, base=Node3D, init)]
 struct PlayerSpawner {
-    #[export]
-    #[var(set=set_player_scene)]
-    player_scene: Option<Gd<PackedScene>>,
     #[export]
     global_signals: Option<Gd<GlobalSignalsImpl>>,
 
     /// the target node that should contain the spawned player
     #[export]
     container: Option<Gd<Node3D>>,
-    player: Option<Gd<Player>>,
+    spawned_nodes: Vec<Gd<Node>>,
     base: Base<Node3D>,
 }
 
 #[godot_api]
 impl INode3D for PlayerSpawner {
-    fn init(base: Base<Node3D>) -> Self {
-        Self {
-            base,
-            player_scene: None,
-            global_signals: None,
-            player: None,
-            container: None,
-        }
-    }
-
     fn ready(&mut self) {
         if !Engine::singleton().is_editor_hint() {
             for mut child in self.base_mut().get_children().iter_shared() {
                 if child.get_process_mode() == ProcessMode::INHERIT {
                     child.set_process_mode(ProcessMode::DISABLED);
+                    if let Ok(mut n3d) = child.try_cast::<Node3D>() {
+                        n3d.set_visible(false);
+                    }
                 }
             }
         }
@@ -234,38 +224,27 @@ impl PlayerSpawner {
             return;
         }
 
-        if let Some(mut existing) = self.player.clone() {
-            existing.queue_free();
-            self.player = None;
+        for mut spawned in self.spawned_nodes.drain(..) {
+            spawned.queue_free();
         }
 
-        if let Some(scene) = self.player_scene.clone() {
-            let mut instance: Gd<Player> = scene.instantiate_as();
-            self.container
-                .clone()
-                .unwrap_or_else(|| self.base().get_parent_node_3d().unwrap())
-                .call_deferred("add_child", &[instance.clone().to_variant()]);
-            instance.set_global_transform(self.base().get_global_transform());
-            for child in self.base_mut().get_children().iter_shared() {
-                let mut dup = child.duplicate_node();
-                dup.set_process_mode(ProcessMode::INHERIT);
-                instance.call_deferred("add_child", &[dup.to_variant()]);
+        let mut container = self
+            .container
+            .clone()
+            .unwrap_or_else(|| self.base().get_parent_node_3d().unwrap());
+        let children = self.base().get_children();
+        for child in children.iter_shared() {
+            let mut dup = child.duplicate_node();
+            dup.set_process_mode(ProcessMode::INHERIT);
+            container.call_deferred("add_child", &[dup.to_variant()]);
+            match (child.try_cast::<Node3D>(), dup.clone().try_cast::<Node3D>()) {
+                (Ok(c3d), Ok(mut d3d)) => {
+                    d3d.set_visible(true);
+                    d3d.set_global_transform(c3d.get_global_transform());
+                }
+                _ => {}
             }
-            self.player = Some(instance);
-        }
-    }
-
-    #[func]
-    fn set_player_scene(&mut self, scene: Option<Gd<PackedScene>>) {
-        self.player_scene = scene.clone();
-        if Engine::singleton().is_editor_hint() {
-            if let Some(mut child) = self.base_mut().find_child_ex("player").owned(false).done() {
-                child.queue_free();
-            }
-            if let Some(scene) = scene.clone() {
-                let instance: Gd<Player> = scene.instantiate_as();
-                self.base_mut().add_child(&instance.upcast::<Node>());
-            }
+            self.spawned_nodes.push(dup.clone());
         }
     }
 }
@@ -849,5 +828,85 @@ impl Mesh3DColorReplace {
                 mesh.set_material_override(Gd::null_arg());
             }
         }
+    }
+}
+// ===================================================================================================
+// ===================================================================================================
+
+#[derive(GodotClass)]
+#[class(base=Node3D, init)]
+pub struct MovementHandler {
+    // runtime vars
+    start_transform: Transform3D,
+    moving: bool,
+    target: Option<Gd<Node3D>>,
+    target_transform_correction: Transform3D,
+    base: Base<Node3D>,
+}
+
+#[godot_api]
+impl INode3D for MovementHandler {
+    fn physics_process(&mut self, _delta: f64) {
+        if self.moving {
+            return;
+        }
+
+        if let Some(target) = self.target.clone() {
+            let tform = target.get_global_transform() * self.target_transform_correction;
+            self.base_mut()
+                .get_parent_node_3d()
+                .unwrap()
+                .set_global_transform(tform);
+        }
+    }
+}
+
+#[godot_api]
+impl MovementHandler {
+    #[signal]
+    pub fn completed_moving();
+
+    #[func]
+    pub fn set_target(&mut self, target: Gd<Node3D>, correction: Transform3D, time: f32) {
+        self.moving = true;
+        self.start_transform = self
+            .base()
+            .get_parent_node_3d()
+            .unwrap()
+            .get_global_transform();
+        self.target = Some(target);
+        self.target_transform_correction = correction;
+        let callable = self.base().callable("interpolate");
+        let tween = self
+            .base_mut()
+            .create_tween()
+            .tween_method(&callable, &0.0.to_variant(), &1.0.to_variant(), time as f64)
+            .set_trans(tween::TransitionType::LINEAR);
+
+        tween
+            .signals()
+            .finished()
+            .connect_other(self, Self::finish_interpolate);
+    }
+
+    #[func]
+    fn interpolate(&mut self, weight: f32) {
+        let basis = self.start_transform.basis;
+        let origin = self.start_transform.origin;
+        let tbasis = self.target.as_ref().unwrap().get_global_basis()
+            * self.target_transform_correction.basis;
+        let torigin = self.target.as_ref().unwrap().get_global_position();
+        self.base_mut()
+            .get_parent_node_3d()
+            .unwrap()
+            .set_global_transform(Transform3D {
+                basis: basis.slerp(&tbasis, weight),
+                origin: origin.lerp(torigin, weight),
+            });
+    }
+
+    fn finish_interpolate(&mut self) {
+        self.moving = false;
+        self.signals().completed_moving().emit();
     }
 }

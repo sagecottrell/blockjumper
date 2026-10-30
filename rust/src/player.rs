@@ -1,7 +1,7 @@
 use std::f32::consts::PI;
 
 use godot::{
-    classes::{Input, RayCast3D, tween},
+    classes::{Input, RayCast3D},
     prelude::*,
 };
 
@@ -13,7 +13,8 @@ pub struct Player {
     base: Base<Node3D>,
 
     #[export]
-    time_to_move: f64,
+    time_to_move: f32,
+
     #[export]
     model: Option<Gd<GLTFImport>>,
     #[export(range = (0.0, 90.0, radians_as_degrees))]
@@ -22,14 +23,9 @@ pub struct Player {
     #[export]
     rotators: Array<Gd<Node3D>>,
 
+    moving: bool,
     // onready
     raycast: Option<Gd<RayCast3D>>,
-
-    // runtime vars
-    start_transform: Transform3D,
-    moving: bool,
-    target: Option<Gd<Node3D>>,
-    target_transform_correction: Transform3D,
 }
 
 #[godot_api]
@@ -40,11 +36,8 @@ impl INode3D for Player {
             model: None,
             raycast: None,
             max_angle: PI / 12.0,
-            start_transform: Transform3D::IDENTITY,
-            target: None,
-            moving: false,
-            target_transform_correction: Transform3D::IDENTITY,
             rotators: Array::new(),
+            moving: false,
             base,
         }
     }
@@ -57,11 +50,6 @@ impl INode3D for Player {
     fn physics_process(&mut self, _delta: f64) {
         if self.moving {
             return;
-        }
-
-        if let Some(target) = self.target.clone() {
-            let tform = target.get_global_transform() * self.target_transform_correction;
-            self.base_mut().set_global_transform(tform);
         }
 
         let input = Input::singleton();
@@ -80,27 +68,16 @@ impl INode3D for Player {
             for mut rotator in self.rotators.iter_shared() {
                 rotator.look_at_ex(d).up(up).done();
             }
-
+            let time = self.time_to_move;
             if let Some((correction, target)) = self.test_move() {
                 model
                     .bind_mut()
-                    .play_animation_with_length("jump".into(), self.time_to_move as f32);
-                self.moving = true;
-                self.start_transform = self.base().get_global_transform();
-                self.target = Some(target);
-                self.target_transform_correction = correction;
-                let callable = self.base().callable("interpolate");
-                let time = self.time_to_move;
-                let tween = self
-                    .base_mut()
-                    .create_tween()
-                    .tween_method(&callable, &0.0.to_variant(), &1.0.to_variant(), time)
-                    .set_trans(tween::TransitionType::LINEAR);
+                    .play_animation_with_length("jump".into(), time);
 
-                tween
-                    .signals()
-                    .finished()
-                    .connect_other(self, Player::finish_interpolate);
+                self.signals()
+                    .selected_target()
+                    .emit(&target, correction, time);
+                self.moving = true;
             }
         }
     }
@@ -121,20 +98,11 @@ static RAYCAST_TRANSFORMS: [Vector3; 2] = [
 
 #[godot_api]
 impl Player {
-    #[func]
-    fn interpolate(&mut self, weight: f32) {
-        let basis = self.start_transform.basis;
-        let origin = self.start_transform.origin;
-        let tbasis = self.target.as_ref().unwrap().get_global_basis()
-            * self.target_transform_correction.basis;
-        let torigin = self.target.as_ref().unwrap().get_global_position();
-        self.base_mut().set_global_transform(Transform3D {
-            basis: basis.slerp(&tbasis, weight),
-            origin: origin.lerp(torigin, weight),
-        });
-    }
+    #[signal]
+    fn selected_target(target: Gd<Node3D>, correction: Transform3D, time: f32);
 
-    fn finish_interpolate(&mut self) {
+    #[func]
+    pub fn done_moving(&mut self) {
         self.moving = false;
     }
 

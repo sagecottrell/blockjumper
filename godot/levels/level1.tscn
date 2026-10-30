@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://l2rnp4oou3rm" path="res://player_discrete.tscn" id="1_b3oru"]
 [ext_resource type="Script" uid="uid://bd046eokvcnu2" path="res://addons/phantom_camera/scripts/phantom_camera_host/phantom_camera_host.gd" id="2_yydhl"]
 [ext_resource type="Script" uid="uid://csjccrhj5wnx7" path="res://addons/phantom_camera/scripts/phantom_camera/phantom_camera_3d.gd" id="3_bekh1"]
+[ext_resource type="Shape3D" uid="uid://gvx8pjgx3m6x" path="res://player_collision_shape.tres" id="3_jq2cn"]
 [ext_resource type="Script" uid="uid://8umksf8e80fw" path="res://addons/phantom_camera/scripts/resources/tween_resource.gd" id="4_8bcou"]
 [ext_resource type="PackedScene" uid="uid://dm84um4p03o08" path="res://models/flag/flag.gltf" id="5_8bcou"]
 [ext_resource type="PackedScene" uid="uid://te1iqexin2l7" path="res://models/heavydutysuperbutton/HeavyDutyButton.tscn" id="6_pdpul"]
@@ -14,10 +15,6 @@
 [ext_resource type="Script" uid="uid://dnaqomcyqdloo" path="res://addons/unibuilder/core/ub_mesh_data.gd" id="9_yydhl"]
 [ext_resource type="PackedScene" uid="uid://dgsbiw80q0aiv" path="res://models/checkpoint/checkpoint.tscn" id="11_yydhl"]
 [ext_resource type="PackedScene" uid="uid://1j54g5vcwtds" path="res://models/bluecone/bluecone.tscn" id="14_f7u7y"]
-
-[sub_resource type="CylinderShape3D" id="CylinderShape3D_prsbl"]
-height = 1.0
-radius = 0.3
 
 [sub_resource type="Resource" id="Resource_t28dx"]
 script = ExtResource("4_8bcou")
@@ -964,7 +961,7 @@ shape_spec = {
 
 [sub_resource type="ColorReplace" id="ColorReplace_f7u7y"]
 input = Color(0.047058824, 0.078431375, 0.5372549, 1)
-output = Color(0.47500247, 0.48560703, 0.9682171, 1)
+output = Color(0.5572751, 0.43646315, 1, 1)
 
 [sub_resource type="ColorReplace" id="ColorReplace_jq2cn"]
 input = Color(0.7019608, 0.85490197, 0.87058824, 1)
@@ -990,28 +987,31 @@ metadata/_custom_type_script = "uid://bd046eokvcnu2"
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 9, -1.5)
 
 [node name="PlayerSpawner" type="PlayerSpawner" parent="spawnercontainer" unique_id=256587168 node_paths=PackedStringArray("global_signals", "container")]
-player_scene = ExtResource("1_b3oru")
 global_signals = NodePath("../../GlobalSignals")
 container = NodePath("../..")
 
-[node name="OmniLight3D" type="DirectionalLight3D" parent="spawnercontainer/PlayerSpawner" unique_id=1413287948]
+[node name="Player" parent="spawnercontainer/PlayerSpawner" unique_id=1482492652 instance=ExtResource("1_b3oru")]
+
+[node name="OmniLight3D" type="DirectionalLight3D" parent="spawnercontainer/PlayerSpawner/Player" unique_id=1413287948]
 transform = Transform3D(1, 0, 0, 0, 0.25881907, 0.9659258, 0, -0.9659258, 0.25881907, 0, 5, 0)
 
-[node name="hitbox" type="Hitbox" parent="spawnercontainer/PlayerSpawner" unique_id=300784542]
+[node name="hitbox" type="Hitbox" parent="spawnercontainer/PlayerSpawner/Player" unique_id=300784542]
 trigger_checkpoint = true
 collision_layer = 32770
 collision_mask = 0
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="spawnercontainer/PlayerSpawner/hitbox" unique_id=1415581673]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
-shape = SubResource("CylinderShape3D_prsbl")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="spawnercontainer/PlayerSpawner/Player/hitbox" unique_id=1415581673]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.609375, 0)
+shape = ExtResource("3_jq2cn")
 debug_color = Color(1, 0, 0, 1)
 
-[node name="PhantomCamera3D" type="Node3D" parent="spawnercontainer/PlayerSpawner" unique_id=1318318917]
+[node name="PhantomCamera3D" type="Node3D" parent="spawnercontainer/PlayerSpawner/Player" unique_id=1318318917]
 transform = Transform3D(1, 0, 0, 0, 0.5, 0.8660253, 0, -0.8660253, 0.5, 0, 4, 1)
 script = ExtResource("3_bekh1")
 tween_resource = SubResource("Resource_t28dx")
 metadata/_custom_type_script = "uid://csjccrhj5wnx7"
+
+[node name="MovementHandler" type="MovementHandler" parent="spawnercontainer/PlayerSpawner/Player" unique_id=204101356]
 
 [node name="flag" parent="spawnercontainer" unique_id=2010456948 instance=ExtResource("5_8bcou")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12930584, 0)
@@ -1232,8 +1232,10 @@ color_replace = Array[ColorReplace]([SubResource("ColorReplace_f7u7y"), SubResou
 [connection signal="checkpoint_get" from="GlobalSignals" to="spawnercontainer/Teleport" method="teleport_parent_to"]
 [connection signal="all_collected" from="GlobalSignals/CollectiblesGroup" to="bridge/PathFollow3D" method="activate"]
 [connection signal="ready" from="spawnercontainer/PlayerSpawner" to="spawnercontainer/PlayerSpawner" method="spawn"]
-[connection signal="checkpoint" from="spawnercontainer/PlayerSpawner/hitbox" to="GlobalSignals" method="on_checkpoint_get"]
-[connection signal="hit" from="spawnercontainer/PlayerSpawner/hitbox" to="spawnercontainer/PlayerSpawner" method="spawn" unbinds=1]
+[connection signal="selected_target" from="spawnercontainer/PlayerSpawner/Player" to="spawnercontainer/PlayerSpawner/Player/MovementHandler" method="set_target"]
+[connection signal="checkpoint" from="spawnercontainer/PlayerSpawner/Player/hitbox" to="GlobalSignals" method="on_checkpoint_get"]
+[connection signal="hit" from="spawnercontainer/PlayerSpawner/Player/hitbox" to="spawnercontainer/PlayerSpawner" method="spawn" unbinds=1]
+[connection signal="completed_moving" from="spawnercontainer/PlayerSpawner/Player/MovementHandler" to="spawnercontainer/PlayerSpawner/Player" method="done_moving"]
 [connection signal="teleported" from="spawnercontainer/Teleport" to="spawnercontainer/flag" method="play_activate" unbinds=1]
 [connection signal="pressed" from="HeavyDutyButton" to="allmovingplatforms/Enabler" method="enable"]
 [connection signal="released" from="HeavyDutyButton" to="allmovingplatforms/Enabler" method="disable"]
