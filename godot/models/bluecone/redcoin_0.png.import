@@ -3,10 +3,9 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://y67sng2i8fpi"
-path.s3tc="res://.godot/imported/redcoin_0.png-35055508dfe6e54aa8867c03f6929b42.s3tc.ctex"
+path="res://.godot/imported/redcoin_0.png-35055508dfe6e54aa8867c03f6929b42.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 generator_parameters={
 "md5": "dd444a0e17b2e9567242745903b4a9b9"
@@ -15,11 +14,11 @@ generator_parameters={
 [deps]
 
 source_file="res://models/bluecone/redcoin_0.png"
-dest_files=["res://.godot/imported/redcoin_0.png-35055508dfe6e54aa8867c03f6929b42.s3tc.ctex"]
+dest_files=["res://.godot/imported/redcoin_0.png-35055508dfe6e54aa8867c03f6929b42.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=0
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

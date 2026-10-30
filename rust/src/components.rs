@@ -718,6 +718,7 @@ pub struct Mesh3DColorReplace {
 impl INode for Mesh3DColorReplace {
     fn exit_tree(&mut self) {
         self.disconnect_all();
+        self.deactivate();
     }
 
     fn on_notification(&mut self, what: NodeNotification) {
@@ -765,17 +766,22 @@ impl Mesh3DColorReplace {
     #[func]
     pub fn set_colors(&mut self, c: Array<Option<Gd<ColorReplace>>>) {
         self.disconnect_all();
-        self.color_replace = c;
+        self.color_replace = c
+            .iter_shared()
+            .map(|x| x.or_else(|| Some(ColorReplace::new_gd())))
+            .collect();
         self.connect_all();
         self.base_mut().call_deferred("update_overrides", &[]);
     }
 
     #[func]
     fn update_overrides(&mut self) {
-        let children = self
-            .base()
-            .get_parent()
-            .expect("must have parent")
+        let parent = self.base().get_parent();
+        if parent.is_none() {
+            return;
+        }
+        let children = parent
+            .unwrap()
             .find_children_ex("")
             .type_("MeshInstance3D")
             .done();
@@ -815,6 +821,7 @@ impl Mesh3DColorReplace {
                 shader.set_shader_parameter("albedo_texture", &albedo);
                 shader.set_shader_parameter("input_color1", &c.bind().input.to_variant());
                 shader.set_shader_parameter("output_color1", &c.bind().output.to_variant());
+                shader.set_next_pass(Some(new_material).as_ref());
                 new_material = shader.upcast::<Material>();
             }
         }
@@ -828,10 +835,12 @@ impl Mesh3DColorReplace {
 
     #[func]
     fn deactivate(&mut self) {
-        let children = self
-            .base()
-            .get_parent()
-            .expect("must have parent")
+        let parent = self.base().get_parent();
+        if parent.is_none() {
+            return;
+        }
+        let children = parent
+            .unwrap()
             .find_children_ex("")
             .type_("MeshInstance3D")
             .done();

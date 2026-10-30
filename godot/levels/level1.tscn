@@ -962,12 +962,13 @@ shape_spec = {
 }
 }
 
-[sub_resource type="ColorReplace" id="ColorReplace_5j4jy"]
-output = Color(0.29803923, 0, 1, 1)
-
 [sub_resource type="ColorReplace" id="ColorReplace_f7u7y"]
 input = Color(0.047058824, 0.078431375, 0.5372549, 1)
-output = Color(1, 0.15294118, 0.25882354, 1)
+output = Color(0.47500247, 0.48560703, 0.9682171, 1)
+
+[sub_resource type="ColorReplace" id="ColorReplace_jq2cn"]
+input = Color(0.7019608, 0.85490197, 0.87058824, 1)
+output = Color(0.91522133, 0.0035235318, 0.10376511, 1)
 
 [node name="Level1" type="Node3D" unique_id=346480120]
 
@@ -1207,29 +1208,26 @@ trap_every = 3.0
 [node name="Checkpoint" parent="." unique_id=78602232 instance=ExtResource("11_yydhl")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 9, -2)
 
-[node name="Mesh3DColorReplace" type="Mesh3DColorReplace" parent="Checkpoint" unique_id=1798988140]
-color_replace = Array[ColorReplace]([SubResource("ColorReplace_5j4jy")])
-
 [node name="Bluecone" parent="." unique_id=1403835074 node_paths=PackedStringArray("collection") instance=ExtResource("14_f7u7y")]
 collection = NodePath("../GlobalSignals/CollectiblesGroup")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 9, -4)
 
-[node name="Mesh3DColorReplace" type="Mesh3DColorReplace" parent="Bluecone" unique_id=932197332]
-color_replace = Array[ColorReplace]([SubResource("ColorReplace_f7u7y")])
+[node name="Mesh3DColorReplace" type="Mesh3DColorReplace" parent="Bluecone" unique_id=2109048105]
+color_replace = Array[ColorReplace]([SubResource("ColorReplace_f7u7y"), SubResource("ColorReplace_jq2cn")])
 
 [node name="Bluecone2" parent="." unique_id=91097844 node_paths=PackedStringArray("collection") instance=ExtResource("14_f7u7y")]
 collection = NodePath("../GlobalSignals/CollectiblesGroup")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 9, -4)
 
 [node name="Mesh3DColorReplace" type="Mesh3DColorReplace" parent="Bluecone2" unique_id=1647844187]
-color_replace = Array[ColorReplace]([SubResource("ColorReplace_f7u7y")])
+color_replace = Array[ColorReplace]([SubResource("ColorReplace_f7u7y"), SubResource("ColorReplace_jq2cn")])
 
 [node name="Bluecone3" parent="." unique_id=102221360 node_paths=PackedStringArray("collection") instance=ExtResource("14_f7u7y")]
 collection = NodePath("../GlobalSignals/CollectiblesGroup")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 9, -2)
 
 [node name="Mesh3DColorReplace" type="Mesh3DColorReplace" parent="Bluecone3" unique_id=1829028703]
-color_replace = Array[ColorReplace]([SubResource("ColorReplace_f7u7y")])
+color_replace = Array[ColorReplace]([SubResource("ColorReplace_f7u7y"), SubResource("ColorReplace_jq2cn")])
 
 [connection signal="checkpoint_get" from="GlobalSignals" to="spawnercontainer/Teleport" method="teleport_parent_to"]
 [connection signal="all_collected" from="GlobalSignals/CollectiblesGroup" to="bridge/PathFollow3D" method="activate"]

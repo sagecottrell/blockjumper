@@ -13,10 +13,9 @@ bool colorMatch(vec4 c1, vec4 c2, float maxDiff) {
 }
 
 void fragment() {
-	
 	vec4 current_color = texture(albedo_texture, UV);
-	if (colorMatch(current_color, input_color1, 0.1))
-			ALBEDO = output_color1.rgb;
+	if (colorMatch(current_color, input_color1, 0.01))
+		ALBEDO = output_color1.rgb;
 	else
-		ALBEDO = current_color.rgb;
+		ALPHA = 0.0;
 }
