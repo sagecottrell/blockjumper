@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use godot::{
     classes::{
         Area3D, Engine, IPathFollow3D, Material, MeshInstance3D, Path3D, PathFollow3D, QuadMesh,
-        StandardMaterial3D, Texture2D, Tween,
+        ShapeCast3D, StandardMaterial3D, Texture2D, Tween,
         base_material_3d::{BillboardMode, ShadingMode, TextureFilter, TextureParam, Transparency},
         node::ProcessMode,
         notify::{Node3DNotification, NodeNotification},
@@ -836,6 +836,11 @@ impl Mesh3DColorReplace {
 #[derive(GodotClass)]
 #[class(base=Node3D, init)]
 pub struct MovementHandler {
+    #[export]
+    shapecast: Option<Gd<ShapeCast3D>>,
+    #[export]
+    #[init(val = 0.5)]
+    collision_forget_dist: f32,
     // runtime vars
     start_transform: Transform3D,
     moving: bool,
@@ -852,11 +857,16 @@ impl INode3D for MovementHandler {
         }
 
         if let Some(target) = self.target.clone() {
+            let mut parent = self.base_mut().get_parent_node_3d().unwrap();
             let tform = target.get_global_transform() * self.target_transform_correction;
-            self.base_mut()
-                .get_parent_node_3d()
-                .unwrap()
-                .set_global_transform(tform);
+            if !self.check_shapecast(tform) {
+                parent.set_global_transform(tform);
+            } else if parent.get_global_position().distance_to(tform.origin)
+                > self.collision_forget_dist
+            {
+                self.target = None;
+                self.signals().forgot_target().emit();
+            }
         }
     }
 }
@@ -865,6 +875,9 @@ impl INode3D for MovementHandler {
 impl MovementHandler {
     #[signal]
     pub fn completed_moving();
+
+    #[signal]
+    pub fn forgot_target();
 
     #[func]
     pub fn set_target(&mut self, target: Gd<Node3D>, correction: Transform3D, time: f32) {
@@ -896,17 +909,30 @@ impl MovementHandler {
         let tbasis = self.target.as_ref().unwrap().get_global_basis()
             * self.target_transform_correction.basis;
         let torigin = self.target.as_ref().unwrap().get_global_position();
+        let transform = Transform3D {
+            basis: basis.slerp(&tbasis, weight),
+            origin: origin.lerp(torigin, weight),
+        };
+        if self.check_shapecast(transform) {
+            return;
+        }
         self.base_mut()
             .get_parent_node_3d()
             .unwrap()
-            .set_global_transform(Transform3D {
-                basis: basis.slerp(&tbasis, weight),
-                origin: origin.lerp(torigin, weight),
-            });
+            .set_global_transform(transform);
     }
 
     fn finish_interpolate(&mut self) {
         self.moving = false;
         self.signals().completed_moving().emit();
+    }
+
+    fn check_shapecast(&mut self, transform: Transform3D) -> bool {
+        if let Some(mut sc) = self.shapecast.clone() {
+            sc.set_global_transform(transform);
+            sc.force_shapecast_update();
+            return sc.is_colliding();
+        }
+        return false;
     }
 }

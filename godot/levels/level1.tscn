@@ -629,6 +629,9 @@ positions = PackedVector3Array(-1, -9, 0, 0, -9, 0, 0, -9, 1, -1, -9, 1, -1, 2, 
 faces = Array[ExtResource("8_lf3p4")]([SubResource("Resource_mxqdg"), SubResource("Resource_tv7bq"), SubResource("Resource_wieee"), SubResource("Resource_xtf7k"), SubResource("Resource_7yq2r"), SubResource("Resource_0nj7r")])
 material_slots = Array[Material]([null, ExtResource("7_lf3p4")])
 
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_jq2cn"]
+data = PackedVector3Array(0, -9, 0, -1, -9, 0, -1, -9, 1, -1, -9, 1, 0, -9, 1, 0, -9, 0, -1, 2, 1, -1, 2, 0, 0, 2, 0, 0, 2, 0, 0, 2, 1, -1, 2, 1, -1, 2, 0, -1, -9, 0, 0, -9, 0, 0, -9, 0, 0, 2, 0, -1, 2, 0, 0, 2, 1, 0, -9, 1, -1, -9, 1, -1, -9, 1, -1, 2, 1, 0, 2, 1, 0, 2, 0, 0, -9, 0, 0, -9, 1, 0, -9, 1, 0, 2, 1, 0, 2, 0, -1, -9, 1, -1, -9, 0, -1, 2, 0, -1, 2, 0, -1, 2, 1, -1, -9, 1)
+
 [sub_resource type="ArrayMesh" id="ArrayMesh_a5s8o"]
 lightmap_size_hint = Vector2i(306, 258)
 _surfaces = [{
@@ -967,10 +970,76 @@ output = Color(0.5572751, 0.43646315, 1, 1)
 input = Color(0.7019608, 0.85490197, 0.87058824, 1)
 output = Color(0.91522133, 0.0035235318, 0.10376511, 1)
 
+[sub_resource type="ArrayMesh" id="ArrayMesh_tx362"]
+lightmap_size_hint = Vector2i(46, 38)
+_surfaces = [{
+"aabb": AABB(-0.5, 0, -0.5, 1, 9, 1),
+"attribute_data": PackedByteArray("/////wAAAD8AAAA/pzc9PofyWj//////AAAAvwAAAD/IQpY+h/JaP/////8AAAC/AAAAv8hClj6voXw//////wAAAD8AAAC/pzc9Pq+hfD//////AAAAvwAAAD9DFjI8r6F8P/////8AAAC/AAAAv0MWMjyH8lo//////wAAAD8AAAC/nN70PYfyWj//////AAAAPwAAAD+c3vQ9r6F8P/////8AAAA/AAAQwac3fT+ivEY//////wAAAD8AAAAAQxYyPKK8Rj//////AAAAvwAAAABDFjI8eQ0lP/////8AAAC/AAAQwac3fT95DSU//////wAAAD8AABDBpzd9Pw3ltT7/////AAAAPwAAAABDFjI8DeW1Pv////8AAAC/AAAAAEMWMjx5DWU+/////wAAAL8AABDBpzd9P3kNZT7/////AAAAPwAAEMFDFjI8NpRXPP////8AAAA/AAAAAKc3fT82lFc8/////wAAAL8AAAAApzd9P+U1FD7/////AAAAvwAAEMFDFjI85TUUPv////8AAAA/AAAAAKc3fT+U1xA//////wAAAL8AAAAApzd9P9hQ3j7/////AAAAvwAAEMFDFjI82FDePv////8AAAA/AAAQwUMWMjyU1xA/"),
+"format": 34359742527,
+"index_count": 36,
+"index_data": PackedByteArray("AAABAAIAAgADAAAABAAFAAYABgAHAAQACAAJAAoACgALAAgADAANAA4ADgAPAAwAEAARABIAEgATABAAFAAVABYAFgAXABQA"),
+"material": ExtResource("7_lf3p4"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 24,
+"vertex_data": PackedByteArray("AAAAPwAAAAAAAAC/AAAAvwAAAAAAAAC/AAAAvwAAAAAAAAA/AAAAPwAAAAAAAAA/AAAAvwAAEEEAAAA/AAAAvwAAEEEAAAC/AAAAPwAAEEEAAAC/AAAAPwAAEEEAAAA/AAAAvwAAEEEAAAC/AAAAvwAAAAAAAAC/AAAAPwAAAAAAAAC/AAAAPwAAEEEAAAC/AAAAPwAAEEEAAAA/AAAAPwAAAAAAAAA/AAAAvwAAAAAAAAA/AAAAvwAAEEEAAAA/AAAAPwAAEEEAAAC/AAAAPwAAAAAAAAC/AAAAPwAAAAAAAAA/AAAAPwAAEEEAAAA/AAAAvwAAAAAAAAA/AAAAvwAAAAAAAAC/AAAAvwAAEEEAAAC/AAAAvwAAEEEAAAA/AIAAAP///78AgAAA////vwCAAAD///+/AIAAAP///78AgP//////vwCA//////+/AID//////78AgP//////v/////8AAP+//////wAA/7//////AAD/v/////8AAP+//3//f////7//f/9/////v/9//3////+//3//f////7///wCA////////AID///////8AgP///////wCA/////wAAAID/f/+/AAAAgP9//78AAACA/3//vwAAAID/f/+/")
+}]
+metadata/ub_uv2_texel = 0.2
+metadata/ub_uv2_scale = Vector3(1, 1, 1)
+metadata/ub_compile_hash = 939305191
+
+[sub_resource type="Resource" id="Resource_o3okg"]
+script = ExtResource("8_lf3p4")
+vertices = PackedInt32Array(0, 3, 2, 1)
+material_index = 1
+uv_coords = PackedVector2Array()
+color_corners = PackedColorArray()
+
+[sub_resource type="Resource" id="Resource_2e30e"]
+script = ExtResource("8_lf3p4")
+vertices = PackedInt32Array(4, 5, 6, 7)
+material_index = 1
+uv_coords = PackedVector2Array()
+color_corners = PackedColorArray()
+
+[sub_resource type="Resource" id="Resource_cikvr"]
+script = ExtResource("8_lf3p4")
+vertices = PackedInt32Array(0, 1, 5, 4)
+material_index = 1
+uv_coords = PackedVector2Array()
+color_corners = PackedColorArray()
+
+[sub_resource type="Resource" id="Resource_umbo4"]
+script = ExtResource("8_lf3p4")
+vertices = PackedInt32Array(2, 3, 7, 6)
+material_index = 1
+uv_coords = PackedVector2Array()
+color_corners = PackedColorArray()
+
+[sub_resource type="Resource" id="Resource_kcd51"]
+script = ExtResource("8_lf3p4")
+vertices = PackedInt32Array(1, 2, 6, 5)
+material_index = 1
+uv_coords = PackedVector2Array()
+color_corners = PackedColorArray()
+
+[sub_resource type="Resource" id="Resource_3awdg"]
+script = ExtResource("8_lf3p4")
+vertices = PackedInt32Array(0, 4, 7, 3)
+material_index = 1
+uv_coords = PackedVector2Array()
+color_corners = PackedColorArray()
+
+[sub_resource type="Resource" id="Resource_w8a51"]
+script = ExtResource("9_yydhl")
+positions = PackedVector3Array(-0.5, 0, -0.5, 0.5, 0, -0.5, 0.5, 0, 0.5, -0.5, 0, 0.5, -0.5, 9, -0.5, 0.5, 9, -0.5, 0.5, 9, 0.5, -0.5, 9, 0.5)
+faces = Array[ExtResource("8_lf3p4")]([SubResource("Resource_o3okg"), SubResource("Resource_2e30e"), SubResource("Resource_cikvr"), SubResource("Resource_umbo4"), SubResource("Resource_kcd51"), SubResource("Resource_3awdg")])
+material_slots = Array[Material]([null, ExtResource("7_lf3p4")])
+
 [node name="Level1" type="Node3D" unique_id=346480120]
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=1001585790]
-transform = Transform3D(1, 0, 0, 0, 0.5, 0.8660253, 0, -0.8660253, 0.5, 3.5, 13, -0.5)
+transform = Transform3D(1, 0, 0, 0, 0.5, 0.8660253, 0, -0.8660253, 0.5, 1.5, 13, -0.5)
 top_level = true
 
 [node name="PhantomCameraHost" type="Node" parent="Camera3D" unique_id=474877632]
@@ -984,7 +1053,7 @@ metadata/_custom_type_script = "uid://bd046eokvcnu2"
 [node name="CollectiblesGroup" type="CollectiblesGroup" parent="GlobalSignals" unique_id=434235092]
 
 [node name="spawnercontainer" type="Node3D" parent="." unique_id=799412018]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 9, -1.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 9, -1.5)
 
 [node name="PlayerSpawner" type="PlayerSpawner" parent="spawnercontainer" unique_id=256587168 node_paths=PackedStringArray("global_signals", "container")]
 global_signals = NodePath("../../GlobalSignals")
@@ -1003,7 +1072,7 @@ collision_mask = 0
 [node name="CollisionShape3D" type="CollisionShape3D" parent="spawnercontainer/PlayerSpawner/Player/hitbox" unique_id=1415581673]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.609375, 0)
 shape = ExtResource("3_jq2cn")
-debug_color = Color(1, 0, 0, 1)
+debug_color = Color(0.24370104, 0.5052516, 1, 1)
 
 [node name="PhantomCamera3D" type="Node3D" parent="spawnercontainer/PlayerSpawner/Player" unique_id=1318318917]
 transform = Transform3D(1, 0, 0, 0, 0.5, 0.8660253, 0, -0.8660253, 0.5, 0, 4, 1)
@@ -1011,7 +1080,16 @@ script = ExtResource("3_bekh1")
 tween_resource = SubResource("Resource_t28dx")
 metadata/_custom_type_script = "uid://csjccrhj5wnx7"
 
-[node name="MovementHandler" type="MovementHandler" parent="spawnercontainer/PlayerSpawner/Player" unique_id=204101356]
+[node name="MovementHandler" type="MovementHandler" parent="spawnercontainer/PlayerSpawner/Player" unique_id=204101356 node_paths=PackedStringArray("shapecast")]
+shapecast = NodePath("../ShapeCast3D")
+collision_forget_dist = 0.4
+
+[node name="ShapeCast3D" type="ShapeCast3D" parent="spawnercontainer/PlayerSpawner/Player" unique_id=173338985]
+shape = ExtResource("3_jq2cn")
+target_position = Vector3(0, 0.6, 0)
+margin = 0.1
+collision_mask = 8
+debug_shape_custom_color = Color(0, 1, 0, 1)
 
 [node name="flag" parent="spawnercontainer" unique_id=2010456948 instance=ExtResource("5_8bcou")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12930584, 0)
@@ -1170,16 +1248,18 @@ collision_mode = 1
 script = ExtResource("9_omn1t")
 
 [node name="UBCube3" type="MeshInstance3D" parent="." unique_id=1086340926]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 9, -1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 9, 0)
 mesh = SubResource("ArrayMesh_lf3p4")
 script = ExtResource("7_omn1t")
 mesh_data = SubResource("Resource_4mjh6")
 collision_mode = 1
 
-[node name="HeavyDutyButton10" parent="UBCube3" unique_id=2086462916 instance=ExtResource("6_pdpul")]
-toggle_on_press = true
-transform = Transform3D(4.371139e-08, 1, 8.742278e-08, 1, -4.371139e-08, 0, 3.821371e-15, 8.742278e-08, -1, 0, 1, 1)
-script = SubResource("GDScript_bi82h")
+[node name="StaticBody3D" type="StaticBody3D" parent="UBCube3" unique_id=1055893770]
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="UBCube3/StaticBody3D" unique_id=1776150613]
+shape = SubResource("ConcavePolygonShape3D_jq2cn")
 
 [node name="UBCylinder" type="MeshInstance3D" parent="." unique_id=1626751752]
 transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, 15, -1, -2)
@@ -1229,6 +1309,26 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 9, -2)
 [node name="Mesh3DColorReplace" type="Mesh3DColorReplace" parent="Bluecone3" unique_id=1829028703]
 color_replace = Array[ColorReplace]([SubResource("ColorReplace_f7u7y"), SubResource("ColorReplace_jq2cn")])
 
+[node name="Path3D" type="Path3D" parent="." unique_id=2101611592]
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 4.5, 9, 0.5)
+curve = SubResource("Curve3D_pdpul")
+
+[node name="TweenController" type="TweenController" parent="Path3D" unique_id=1790139365]
+forward_speed = 2.0
+wait_one = 1.0
+start_activated = true
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 4, 0, 0)
+
+[node name="UBCube4" type="MeshInstance3D" parent="Path3D/TweenController" unique_id=1345611993]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, -9, 0)
+mesh = SubResource("ArrayMesh_tx362")
+script = ExtResource("7_omn1t")
+mesh_data = SubResource("Resource_w8a51")
+collision_mode = 1
+
+[node name="UBArea3DContainer" type="Node3D" parent="Path3D/TweenController/UBCube4" unique_id=827516884]
+script = ExtResource("9_omn1t")
+
 [connection signal="checkpoint_get" from="GlobalSignals" to="spawnercontainer/Teleport" method="teleport_parent_to"]
 [connection signal="all_collected" from="GlobalSignals/CollectiblesGroup" to="bridge/PathFollow3D" method="activate"]
 [connection signal="ready" from="spawnercontainer/PlayerSpawner" to="spawnercontainer/PlayerSpawner" method="spawn"]
@@ -1236,8 +1336,7 @@ color_replace = Array[ColorReplace]([SubResource("ColorReplace_f7u7y"), SubResou
 [connection signal="checkpoint" from="spawnercontainer/PlayerSpawner/Player/hitbox" to="GlobalSignals" method="on_checkpoint_get"]
 [connection signal="hit" from="spawnercontainer/PlayerSpawner/Player/hitbox" to="spawnercontainer/PlayerSpawner" method="spawn" unbinds=1]
 [connection signal="completed_moving" from="spawnercontainer/PlayerSpawner/Player/MovementHandler" to="spawnercontainer/PlayerSpawner/Player" method="done_moving"]
+[connection signal="forgot_target" from="spawnercontainer/PlayerSpawner/Player/MovementHandler" to="spawnercontainer/PlayerSpawner" method="spawn"]
 [connection signal="teleported" from="spawnercontainer/Teleport" to="spawnercontainer/flag" method="play_activate" unbinds=1]
 [connection signal="pressed" from="HeavyDutyButton" to="allmovingplatforms/Enabler" method="enable"]
 [connection signal="released" from="HeavyDutyButton" to="allmovingplatforms/Enabler" method="disable"]
-[connection signal="pressed" from="UBCube3/HeavyDutyButton10" to="bridge/PathFollow3D" method="activate"]
-[connection signal="released" from="UBCube3/HeavyDutyButton10" to="bridge/PathFollow3D" method="deactivate"]
