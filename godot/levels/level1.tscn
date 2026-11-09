@@ -1,6 +1,5 @@
 [gd_scene format=4 uid="uid://kl0t8fcnbwym"]
 
-[ext_resource type="PackedScene" uid="uid://l2rnp4oou3rm" path="res://player_discrete.tscn" id="1_b3oru"]
 [ext_resource type="Script" uid="uid://bd046eokvcnu2" path="res://addons/phantom_camera/scripts/phantom_camera_host/phantom_camera_host.gd" id="2_yydhl"]
 [ext_resource type="Script" uid="uid://csjccrhj5wnx7" path="res://addons/phantom_camera/scripts/phantom_camera/phantom_camera_3d.gd" id="3_bekh1"]
 [ext_resource type="Shape3D" uid="uid://gvx8pjgx3m6x" path="res://player_collision_shape.tres" id="3_jq2cn"]
@@ -15,6 +14,7 @@
 [ext_resource type="Script" uid="uid://dnaqomcyqdloo" path="res://addons/unibuilder/core/ub_mesh_data.gd" id="9_yydhl"]
 [ext_resource type="PackedScene" uid="uid://dgsbiw80q0aiv" path="res://models/checkpoint/checkpoint.tscn" id="11_yydhl"]
 [ext_resource type="PackedScene" uid="uid://1j54g5vcwtds" path="res://models/bluecone/bluecone.tscn" id="14_f7u7y"]
+[ext_resource type="PackedScene" uid="uid://ber58ul261534" path="res://models/jumper/blockjumper.gltf" id="16_a5s8o"]
 
 [sub_resource type="Resource" id="Resource_t28dx"]
 script = ExtResource("4_8bcou")
@@ -1059,7 +1059,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 9, -1.5)
 global_signals = NodePath("../../GlobalSignals")
 container = NodePath("../..")
 
-[node name="Player" parent="spawnercontainer/PlayerSpawner" unique_id=1482492652 instance=ExtResource("1_b3oru")]
+[node name="Player" type="Player" parent="spawnercontainer/PlayerSpawner" unique_id=213069515 node_paths=PackedStringArray("model", "rotators")]
+model = NodePath("TargetSelector/blockbench_export")
+rotators = [NodePath("TargetSelector")]
 
 [node name="OmniLight3D" type="DirectionalLight3D" parent="spawnercontainer/PlayerSpawner/Player" unique_id=1413287948]
 transform = Transform3D(1, 0, 0, 0, 0.25881907, 0.9659258, 0, -0.9659258, 0.25881907, 0, 5, 0)
@@ -1079,6 +1081,16 @@ transform = Transform3D(1, 0, 0, 0, 0.5, 0.8660253, 0, -0.8660253, 0.5, 0, 4, 1)
 script = ExtResource("3_bekh1")
 tween_resource = SubResource("Resource_t28dx")
 metadata/_custom_type_script = "uid://csjccrhj5wnx7"
+
+[node name="TargetSelector" type="TargetSelector" parent="spawnercontainer/PlayerSpawner/Player" unique_id=761670484 node_paths=PackedStringArray("raycast")]
+raycast = NodePath("RayCast3D")
+
+[node name="blockbench_export" parent="spawnercontainer/PlayerSpawner/Player/TargetSelector" unique_id=1943525194 instance=ExtResource("16_a5s8o")]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
+
+[node name="RayCast3D" type="RayCast3D" parent="spawnercontainer/PlayerSpawner/Player/TargetSelector" unique_id=350209843]
+target_position = Vector3(0, 0, -2)
+collide_with_areas = true
 
 [node name="MovementHandler" type="MovementHandler" parent="spawnercontainer/PlayerSpawner/Player" unique_id=204101356 node_paths=PackedStringArray("shapecast")]
 shapecast = NodePath("../ShapeCast3D")
@@ -1332,11 +1344,13 @@ script = ExtResource("9_omn1t")
 [connection signal="checkpoint_get" from="GlobalSignals" to="spawnercontainer/Teleport" method="teleport_parent_to"]
 [connection signal="all_collected" from="GlobalSignals/CollectiblesGroup" to="bridge/PathFollow3D" method="activate"]
 [connection signal="ready" from="spawnercontainer/PlayerSpawner" to="spawnercontainer/PlayerSpawner" method="spawn"]
-[connection signal="selected_target" from="spawnercontainer/PlayerSpawner/Player" to="spawnercontainer/PlayerSpawner/Player/MovementHandler" method="set_target"]
+[connection signal="rotated" from="spawnercontainer/PlayerSpawner/Player" to="spawnercontainer/PlayerSpawner/Player/TargetSelector" method="test_target"]
 [connection signal="checkpoint" from="spawnercontainer/PlayerSpawner/Player/hitbox" to="GlobalSignals" method="on_checkpoint_get"]
 [connection signal="hit" from="spawnercontainer/PlayerSpawner/Player/hitbox" to="spawnercontainer/PlayerSpawner" method="spawn" unbinds=1]
+[connection signal="selected_target" from="spawnercontainer/PlayerSpawner/Player/TargetSelector" to="spawnercontainer/PlayerSpawner/Player/MovementHandler" method="set_target"]
 [connection signal="completed_moving" from="spawnercontainer/PlayerSpawner/Player/MovementHandler" to="spawnercontainer/PlayerSpawner/Player" method="done_moving"]
 [connection signal="forgot_target" from="spawnercontainer/PlayerSpawner/Player/MovementHandler" to="spawnercontainer/PlayerSpawner" method="spawn"]
+[connection signal="started_moving" from="spawnercontainer/PlayerSpawner/Player/MovementHandler" to="spawnercontainer/PlayerSpawner/Player" method="start_jump"]
 [connection signal="teleported" from="spawnercontainer/Teleport" to="spawnercontainer/flag" method="play_activate" unbinds=1]
 [connection signal="pressed" from="HeavyDutyButton" to="allmovingplatforms/Enabler" method="enable"]
 [connection signal="released" from="HeavyDutyButton" to="allmovingplatforms/Enabler" method="disable"]

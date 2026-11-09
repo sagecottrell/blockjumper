@@ -35,6 +35,12 @@ project/assembly_name="blockjumper"
 
 enabled=PackedStringArray("res://addons/phantom_camera/plugin.cfg", "res://addons/unibuilder/plugin.cfg")
 
+[file_customization]
+
+folder_colors={
+"res://testscenes/": "gray"
+}
+
 [input]
 
 forward={

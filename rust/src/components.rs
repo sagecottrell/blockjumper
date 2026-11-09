@@ -1,9 +1,9 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, f32::consts::PI};
 
 use godot::{
     classes::{
         Area3D, Engine, IPathFollow3D, Material, MeshInstance3D, Path3D, PathFollow3D, QuadMesh,
-        ShapeCast3D, StandardMaterial3D, Texture2D, Tween,
+        RayCast3D, ShapeCast3D, StandardMaterial3D, Texture2D, Tween,
         base_material_3d::{BillboardMode, ShadingMode, TextureFilter, TextureParam, Transparency},
         node::ProcessMode,
         notify::{Node3DNotification, NodeNotification},
@@ -14,7 +14,8 @@ use godot::{
 };
 
 use crate::{
-    ColorReplace, DamageSource, GLTFImport, color_replace_shader, global_signals::GlobalSignalsImpl,
+    ColorReplace, DamageSource, GLTFImport, Platform, color_replace_shader,
+    global_signals::GlobalSignalsImpl,
 };
 
 #[derive(GodotClass)]
@@ -841,12 +842,16 @@ pub struct MovementHandler {
     #[export]
     #[init(val = 0.5)]
     collision_forget_dist: f32,
+    #[export]
+    #[init(val = 0.25)]
+    time_to_move: f32,
     // runtime vars
     start_transform: Transform3D,
     moving: bool,
     target: Option<Gd<Node3D>>,
     target_transform_correction: Transform3D,
     base: Base<Node3D>,
+    tweener: Option<Gd<Tween>>,
 }
 
 #[godot_api]
@@ -879,8 +884,11 @@ impl MovementHandler {
     #[signal]
     pub fn forgot_target();
 
+    #[signal]
+    pub fn started_moving();
+
     #[func]
-    pub fn set_target(&mut self, target: Gd<Node3D>, correction: Transform3D, time: f32) {
+    pub fn set_target(&mut self, target: Gd<Node3D>, correction: Transform3D) {
         self.moving = true;
         self.start_transform = self
             .base()
@@ -890,9 +898,11 @@ impl MovementHandler {
         self.target = Some(target);
         self.target_transform_correction = correction;
         let callable = self.base().callable("interpolate");
-        let tween = self
-            .base_mut()
-            .create_tween()
+        let time = self.time_to_move;
+        let tween = self.base_mut().create_tween();
+        self.tweener = Some(tween.clone());
+        let tween = tween
+            .clone()
             .tween_method(&callable, &0.0.to_variant(), &1.0.to_variant(), time as f64)
             .set_trans(tween::TransitionType::LINEAR);
 
@@ -900,6 +910,7 @@ impl MovementHandler {
             .signals()
             .finished()
             .connect_other(self, Self::finish_interpolate);
+        self.signals().started_moving().emit();
     }
 
     #[func]
@@ -914,6 +925,10 @@ impl MovementHandler {
             origin: origin.lerp(torigin, weight),
         };
         if self.check_shapecast(transform) {
+            if let Some(mut tween) = self.tweener.clone() {
+                tween.stop();
+                self.signals().completed_moving().emit();
+            }
             return;
         }
         self.base_mut()
@@ -934,5 +949,97 @@ impl MovementHandler {
             return sc.is_colliding();
         }
         return false;
+    }
+}
+// ===================================================================================================
+// ===================================================================================================
+
+static RAYCAST_TRANSFORMS: [Vector3; 2] = [
+    Vector3 {
+        x: 0.0,
+        y: 0.5,
+        z: 0.0,
+    },
+    Vector3 {
+        x: 0.0,
+        y: 0.1,
+        z: 0.0,
+    },
+];
+#[derive(GodotClass)]
+#[class(base=Node3D, init)]
+pub struct TargetSelector {
+    #[export]
+    raycast: Option<Gd<RayCast3D>>,
+    #[export(range = (0.0, 90.0, radians_as_degrees))]
+    #[init(val= PI / 12.0)]
+    max_angle: f32,
+    base: Base<Node3D>,
+}
+
+#[godot_api]
+impl TargetSelector {
+    #[signal]
+    fn selected_target(target: Gd<Node3D>, correction: Transform3D);
+
+    #[signal]
+    fn target_select_failed();
+
+    #[func]
+    fn test_target(&mut self) {
+        if let Some((correction, target)) = self.test_move() {
+            self.signals().selected_target().emit(&target, correction);
+        } else {
+            self.signals().target_select_failed().emit();
+        }
+    }
+
+    fn test_move(&self) -> Option<(Transform3D, Gd<Node3D>)> {
+        match self.raycast.clone() {
+            Some(mut raycast) => {
+                let up_dir = self.base().get_global_basis().col_b();
+                for transform in RAYCAST_TRANSFORMS {
+                    raycast.set_position(transform);
+                    raycast.force_raycast_update();
+                    let collider = raycast.get_collider();
+                    let parent = self.base().get_parent_node_3d();
+                    if let Some(collider) = collider
+                        && let Ok(platform) = collider.try_cast::<Platform>()
+                        && let Some(parent) = parent
+                    {
+                        let target = platform
+                            .bind()
+                            .get_anchor(raycast.get_collision_point())
+                            .unwrap();
+                        let is_close =
+                            target.get_global_basis().col_b().angle_to(up_dir) <= self.max_angle;
+
+                        if !is_close {
+                            continue;
+                        }
+
+                        // rotate the transform until all the directions line up with our current rotation.
+                        // this is necessary because the anchor_transform up direction might be aligned with us, but not in any other directions.
+
+                        let a_direction = parent.get_global_basis().col_a();
+                        let target_transform = target.get_global_transform();
+                        let mut correction = Transform3D::IDENTITY;
+                        while (target_transform * correction)
+                            .basis
+                            .col_a()
+                            .dot(a_direction)
+                            < 0.5
+                        {
+                            correction.basis =
+                                correction.basis.rotated(correction.basis.col_b(), PI / 2.0);
+                        }
+
+                        return Some((correction, target));
+                    }
+                }
+                None
+            }
+            _ => None,
+        }
     }
 }
