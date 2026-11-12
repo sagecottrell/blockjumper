@@ -35,7 +35,17 @@ impl INode3D for Player {
         }
 
         let direction = Vector3::new(direction.x, 0., direction.y).normalized();
+        self.turn_to_face(direction);
+    }
+}
 
+#[godot_api]
+impl Player {
+    #[signal]
+    pub fn rotated();
+
+    #[func]
+    pub fn turn_to_face(&mut self, direction: Vector3) {
         let up = self.base().get_global_basis().col_b();
 
         let d = self.base().to_global(direction);
@@ -45,12 +55,6 @@ impl INode3D for Player {
 
         self.signals().rotated().emit();
     }
-}
-
-#[godot_api]
-impl Player {
-    #[signal]
-    pub fn rotated();
 
     #[func]
     pub fn done_moving(&mut self) {

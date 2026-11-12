@@ -2,8 +2,9 @@ use std::{collections::HashMap, f32::consts::PI};
 
 use godot::{
     classes::{
-        Area3D, Engine, IPathFollow3D, Material, MeshInstance3D, Path3D, PathFollow3D, QuadMesh,
-        RayCast3D, ShapeCast3D, StandardMaterial3D, Texture2D, Tween,
+        Area3D, CollisionShape3D, Engine, IArea3D, IPathFollow3D, Material, MeshInstance3D, Path3D,
+        PathFollow3D, QuadMesh, RayCast3D, Shape3D, ShapeCast3D, StandardMaterial3D, Texture2D,
+        Tween,
         base_material_3d::{BillboardMode, ShadingMode, TextureFilter, TextureParam, Transparency},
         node::ProcessMode,
         notify::{Node3DNotification, NodeNotification},
@@ -295,6 +296,9 @@ impl IPathFollow3D for TweenController {
     }
 
     fn ready(&mut self) {
+        if let Some(mut tween) = self.tween.clone() {
+            tween.stop();
+        }
         if self.start_activated {
             self.activate();
         }
@@ -514,6 +518,14 @@ impl Hitbox {
             return;
         }
         self.signals().checkpoint().emit(&cp);
+    }
+
+    #[signal]
+    pub fn pushed(direction: Vector3);
+
+    #[func]
+    pub fn on_push(&mut self, direction: Vector3) {
+        self.signals().pushed().emit(direction);
     }
 }
 
@@ -851,11 +863,19 @@ pub struct MovementHandler {
     target: Option<Gd<Node3D>>,
     target_transform_correction: Transform3D,
     base: Base<Node3D>,
+    shapecast_init_pos: Vector3,
     tweener: Option<Gd<Tween>>,
 }
 
 #[godot_api]
 impl INode3D for MovementHandler {
+    fn ready(&mut self) {
+        self.shapecast_init_pos = self
+            .shapecast
+            .as_ref()
+            .map(|x| x.get_position())
+            .unwrap_or_default();
+    }
     fn physics_process(&mut self, _delta: f64) {
         if self.moving {
             return;
@@ -945,6 +965,8 @@ impl MovementHandler {
     fn check_shapecast(&mut self, transform: Transform3D) -> bool {
         if let Some(mut sc) = self.shapecast.clone() {
             sc.set_global_transform(transform);
+            let p = sc.get_position() + self.shapecast_init_pos;
+            sc.set_position(p);
             sc.force_shapecast_update();
             return sc.is_colliding();
         }
@@ -1041,5 +1063,89 @@ impl TargetSelector {
             }
             _ => None,
         }
+    }
+}
+// ===================================================================================================
+// ===================================================================================================
+//
+
+#[derive(GodotClass)]
+#[class(base=Area3D, init, tool)]
+pub struct StickyArea {
+    last_pos: Vector3,
+    diff: Vector3,
+    items: Vec<Gd<Node3D>>,
+    base: Base<Area3D>,
+}
+
+#[godot_api]
+impl IArea3D for StickyArea {
+    fn ready(&mut self) {
+        self.last_pos = self.base().get_global_position();
+        let s = self.to_gd();
+        self.signals()
+            .area_entered()
+            .connect_other(&s, Self::on_area_enter);
+        self.signals()
+            .area_exited()
+            .connect_other(&s, Self::on_area_exit);
+        if let Some(shape) = self.get_cs3d() {
+            let mut new_child = CollisionShape3D::new_alloc();
+            new_child.set_shape(&shape);
+            self.base_mut()
+                .add_child(&new_child.clone().upcast::<Node>());
+            new_child.set_owner(Some(&self.to_gd()));
+        }
+    }
+
+    fn process(&mut self, _delta: f64) {
+        let current_pos = self.base().get_global_position();
+        self.diff = current_pos - self.last_pos;
+        self.last_pos = current_pos;
+
+        for item in self.items.iter() {
+            self.process_item(item.clone());
+        }
+    }
+}
+
+#[godot_api]
+impl StickyArea {
+    #[func]
+    pub fn on_area_enter(&mut self, area: Gd<Area3D>) {
+        let n3d = area.upcast::<Node3D>();
+        if !self.items.contains(&n3d) && !self.diff.is_zero_approx() {
+            self.process_item(n3d.clone());
+            self.items.push(n3d);
+        }
+    }
+
+    #[func]
+    pub fn on_area_exit(&mut self, area: Gd<Area3D>) {
+        let n3d = area.upcast::<Node3D>();
+        if let Some(index) = self.items.iter().position(|x| *x == n3d) {
+            self.items.remove(index);
+        }
+    }
+
+    fn process_item(&self, item: Gd<Node3D>) {
+        let mut target: Gd<Node3D> = item.clone().upcast::<Node3D>();
+        if let Ok(mut hitbox) = item.try_cast::<Hitbox>() {
+            target = hitbox.get_parent_node_3d().unwrap();
+            hitbox.bind_mut().on_push(self.diff);
+        }
+        let new_pos = target.get_position() + self.diff;
+        target.set_position(new_pos);
+    }
+
+    fn get_cs3d(&mut self) -> Option<Gd<Shape3D>> {
+        self.base()
+            .get_parent()?
+            .find_child_ex("Shape")
+            .owned(false)
+            .done()?
+            .try_cast::<CollisionShape3D>()
+            .ok()?
+            .get_shape()
     }
 }

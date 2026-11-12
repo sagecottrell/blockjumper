@@ -2,6 +2,11 @@
 class_name UBArea3DContainer
 extends Node3D
 
+@export_flags_3d_physics var collision_layer = 2:
+	set(value):
+		collision_layer = value
+		if is_inside_tree():
+			_update_all_collision_layers()
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -26,6 +31,11 @@ func _process(_delta):
 						if shape is CylinderShape3D:
 							DebugDraw3D.draw_capsule(child2.global_position, child2.quaternion, shape.radius, shape.height)
 				DebugDraw3D.draw_arrow(child.global_position, child.to_global(Vector3.UP))
+
+func _update_all_collision_layers():
+	for child in get_children():
+		if child is Platform:
+			child.collision_layer = collision_layer
 
 func _do_mesh(parent: UBMeshInstance3D):
 	var data := parent.mesh_data
@@ -75,6 +85,7 @@ func _quad(v: Array[Vector3]):
 			var tform := Transform3D(b, p)
 			var area3d := Platform.new()
 			area3d.transform = tform
+			area3d.collision_layer = collision_layer
 			add_child(area3d)
 			_new_collisionshape(area3d)
 
